@@ -1,6 +1,9 @@
-1，选择一个文件夹作为目录
-2，使用git init命令将该目录变成Git 可以管理的目录。
-	多产生一个叫.git的隐藏目录。
-3，git add 文件名.XXX
-4，git commit -m "说明信息"。
-	commit 时可以一次性提交多条add的信息。
+1,	Choose a File to be content.
+2,	Use "git init" command to change this content to be a content which Git can manage.
+	accompany create a hidden file named .git.
+3,	git add fileName.XXX
+4,	git commit -m "Info"
+	could commit more than one add operation.
+	
+5,	"git status" to see status
+6,	"git diff" to see difference between each version.
