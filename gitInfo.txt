@@ -9,3 +9,14 @@
 6,	"git diff" to see difference between each version.
 
 7,	when file changed and commit needed. Should add and commit[3,4].
+
+8,	"git log" not support. "git log --pretty=oneline"
+	shows leatest commit info.[Id + info]
+9,	"git reset --hard HEAD^"	to  pre version
+	HEAD^^: pre pre version
+	HEAD~100: pre 100
+	
+	"git reset --hard 'Id'"	back to version by Id
+10,	"git reflog"
+	shows command history. In this way, you can find wanted version Id + info.
+	
