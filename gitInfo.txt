@@ -30,3 +30,8 @@
 	
 13. git reset HEAD fileName.XXX
 	drop add
+	
+14. git rm fileName.XXX
+	delete fileName.XXX
+	git commit -m "message"
+	commit needed
