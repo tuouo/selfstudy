@@ -20,3 +20,9 @@
 10,	"git reflog"
 	shows command history. In this way, you can find wanted version Id + info.
 	
+11, if amount abc.XXX want to be added.
+	git add *.py		(.py as example)
+	git status 			(to see info)
+	git reset HEAD 1.py	(remove 1.py)
+	
+	
