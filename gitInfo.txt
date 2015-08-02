@@ -25,7 +25,8 @@
 	git status 			(to see info)
 	git reset HEAD 1.py	(remove 1.py)
 	
-12.	git check -- fileName.XXX
+12.	git checkout -- fileName.XXX
 	back to leatest add or commit.
 	
-	
+13. git reset HEAD fileName.XXX
+	drop add
