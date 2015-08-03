@@ -4,3 +4,4 @@ Git is free software distributed under the GPL.
 OK.
 
 New branch.
+Branch add, merge master.
