@@ -8,7 +8,7 @@
 5,	"git status" to see status
 6,	"git diff" to see difference between each version.
 
-7,	when file changed and commit needed. Should add and commit[3,4].
+7,	when file changed and commit needed. Should add and commit. see[3,4].
 
 8,	"git log" not support. "git log --pretty=oneline"
 	shows leatest commit info.[Id + info]
