@@ -1,7 +1,11 @@
 # My tool py:
+hello.py
 test.py
 test.txt
 
 # My resource
 123.png
 12321.jpg
+
+# Cache
+__pycache__
