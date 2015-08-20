@@ -41,5 +41,4 @@ def trianglesGen(num):					# num: p i
         n += 1	
 for i in trianglesGen(4):
     print(i)
-            
 		
