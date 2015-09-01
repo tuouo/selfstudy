@@ -23,7 +23,7 @@ print(len('ABC'), len('中文'))
 print(len(b'ABC'), len(b'\xe4\xb8\xad\xe6\x96\x87'), len('中文'.encode('utf-8')))
 
 print("\n10 / 3 =", 10 / 3)
-print("10 / 7 =", 10 / 7)			# 1 + 16
+print("10 / 7 =", 10 / 7)			# 17 in total
 print("10 // 3 =", 10 // 3)
 print('10 // 7 =', 10 // 7)
 print('Hi, %s, you have $%d.'%('tuouo', 100000))
