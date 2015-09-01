@@ -53,6 +53,10 @@ data = r'''<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 </rss>
 '''
 
+# from urllib import request	
+# with request.urlopen('http://weather.yahooapis.com/forecastrss?u=c&w=2151330') as page:
+    # data = page.read();
+
 from enum import Enum, unique
 @unique
 class Weekday(Enum):
