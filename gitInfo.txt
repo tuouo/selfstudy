@@ -1,3 +1,5 @@
+git config --global user.name "Your name"
+git config --global user.email "exampl@example.com"
 1,	Choose a File to be content.
 2,	Use "git init" command to change this content to be a content which Git can manage.
 	accompany create a hidden file named .git.
