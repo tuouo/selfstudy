@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 import socket, threading, time
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(('127.0.0.1', 9999))
+ip = '127.0.0.1'
+ip = '0.0.0.0'
+s.bind((ip, 9999))		# 1024 special
 s.listen(5)
 print('wait for connection...')
 
