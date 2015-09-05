@@ -11,7 +11,7 @@ password = ''
 to_addr = '@outlook.com'	#  treat as spam
 #  http://mail.163.com/help/help_spam_16.htm?ip=115.193.179.73&hostid=smtp13&time=1441433109'
 
-to_addr = 'ltytuotuo@163.com'
+to_addr = '@163.com'
 smtp_sever = 'smtp.163.com'
 
 import smtplib
