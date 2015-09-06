@@ -14,18 +14,25 @@ def _format_addr(s):
 # password = input("Password: ")
 # to_addr = input("To: ")
 # smtp_sever = input("SMTP server: ")
-from_addr = '@163.com'
-password = ''
-to_addr = '@outlook.com'
-smtp_sever = 'smtp.163.com'
+from_addr = 'ltytuotuo@gmail.com'
+password = '503307google'
+to_addr = 'ltytuotuo@163.com'
+smtp_sever = 'smtp.gmail.com'
+#smtp_sever = 'smtp.163.com'
 #smtp_sever = 'smtp-mail.outlook.com'
 
-msg = MIMEText('Hello, send by Python...', 'plain', 'utf-8')
+#msg = MIMEText('Hello, send by Python...', 'plain', 'utf-8')	# if both, html first, then plain
+msg = MIMEText('<html><body><h1>Hello (html)</h1>' +
+    '<p> send by <a href = "http://www.python.org">Python</a>...</p>' + 
+    '</body></html>', 'html', 'utf-8')
+	
 msg['From'] = _format_addr('Pythoner 骆<%s>' % from_addr)
-msg['To'] = _format_addr('Receive 马各<%s>' % to_addr)
-msg['Subject'] = Header('From SMTP 练习', 'utf-8').encode()
+msg['To'] = _format_addr('Receive<%s>' % to_addr)
+msg['Subject'] = Header('From SMTP html outlook', 'utf-8').encode()
 
-server = smtplib.SMTP(smtp_sever, 25)
+
+server = smtplib.SMTP(smtp_sever, 587)	# gmail 
+server.starttls()						# Encrypt SMTP
 server.set_debuglevel(1)
 server.login(from_addr, password)		# outlook not support SMTP AUTH
 server.sendmail(from_addr, [to_addr], msg.as_string())
