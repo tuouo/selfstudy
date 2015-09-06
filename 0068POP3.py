@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import poplib
+from email.parser import Parser
+from email.header import decode_header
+from email.utils import parseaddr
 
 # email = input("Email: ")
 # password = input("Password: ")
 # pop_sever = input("POP3 server: ")
-email = '@163.com'
-password = ''
+email = 'ltytuotuo@163.com'
+password = 'ltywy503307'
 pop_sever = 'pop.163.com'
 
 server = poplib.POP3(pop_sever)
