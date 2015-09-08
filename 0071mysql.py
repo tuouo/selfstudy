@@ -5,6 +5,8 @@ import mysql.connector
 # mysql service must start before this program run.
 # or can't connect
 
+# pip install mysql-connector-python --allow-external mysql-connector-python
+
 conn = mysql.connector.connect(user = 'root', password = '', database = 'test')
 cursor = conn.cursor()
 cursor.execute('create table user (id varchar(20) primary key, name varchar(20))')
