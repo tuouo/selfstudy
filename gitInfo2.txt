@@ -6,7 +6,6 @@ ssh-keygen -t rsa -C "ltytuotuo@gmail.com"
 登陆GitHub，然后，在右上角找到“Create a new repo”按钮，创建一个新的仓库：
 要关联一个远程库
 git remote add origin git@github.com:tuouo/git.git(首次会有一些问题)
-
 git push -u origin master	(master 表示当前分支，所有内容)
 以后可以省去 -u参数
 git push origin master
