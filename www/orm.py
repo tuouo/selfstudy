@@ -80,6 +80,11 @@ class TextField(Field):
     def __init__(self, name = None, default = None):
         super().__init__(name, 'text', False, default)
 
+def creArgsStr(num):
+    l = []
+    for i in range(num):
+        l.append('?')
+    return ', '.join(l)
 
 class ModelMetaclass(type):
     def __new__(class, name, bases, attrs):
@@ -146,6 +151,45 @@ class Model(dict, metaclass = ModleMetaclass):
                 logging.debug('using default value for %s:%s' % (key, str(value)))
                 setattr(self, key, value)
         return value
+
+    @classmethod
+    @asyncio.coroutine
+    def find(cls, pk):						
+        ' find object by primary key.'
+        rs = yield from select('%s where `%s` = ?' % (cls.__select__, cls.__primarykey__), [pk], 1)
+        if len(rs) == 0:
+            return None
+        return (**rs[0])
+    # user = yield from User.find('123')
+
+    @classmethod
+    @asyncio.coroutine
+    def findAll(cls, where = None, args = None, **kw):
+        ' find objects by "where clause"'
+        sql = [cls.__select__]
+        if where:
+            sql.append('where')
+            sql.append(where)
+        if args is None:
+            args = []
+        orderBy = kw.get("orderBy", None)
+        if orderBy:
+            sql.append('orderBy')
+            sql.append(orderBy)
+            
+
+
+
+    @asyncio.coroutine
+    def save(self):
+        args = list(map(self.getDefaultValue, self.__fields__))
+        args.append(self.getDefaultValue(self.__primarykey__))
+        rows = yield from execute(self.__insert__, args)
+        if rows != 1:
+            logging.warn('failed to insert record: affected rows: %s' % rows)
+    # user = User(id = 123, name = 'tuouo')
+    # yield from user.save()
+
 
     
 
