@@ -33,19 +33,27 @@ def select(sql, args, size = None):
         else:
             rs = yield from cur.fetchall()
         yield from cur.close()
-        logging.info('Rows returned is %s' % len(rs))	
+        logging.info('Rows returned: %s' % len(rs))	
         return rs
 
 @asyncio.coroutine
 def execute(sql, args, autocommit = True):
-    log(sql)
+    log(sql)		#log(sql, args)
     global __pool
     with (yield from __pool) as conn:
+    	if not autocomit:
+    	    yield from conn.begin()
         try:
+            #cur = yield from conn.cursor()
             cur = yield from conn.curson(aiomysql.DictCursor)
             yield from cur.execute(sql.replace('?', '%s'), args)
             affected = cur.rowconut
+            yield from cur.close()
+            if not autocomit:
+                yield from conn.commit()
         except BaseException as e:
+        	if not autocomit:
+        	    yield from conn.rollback()
             raise 
         return affected
 
@@ -88,7 +96,7 @@ def creArgsStr(num):
 
 class ModelMetaclass(type):
     def __new__(class, name, bases, attrs):
-        if __name__ = 'Model':									# ignore Model self
+        if name = 'Model':									# ignore Model self
             return type.__new(class, name, bases, attrs)	
         tableName = attrs.get('__table__', None) or name
         logging.info('found model: %s (table %s)' % (name, tableName))	
@@ -101,12 +109,12 @@ class ModelMetaclass(type):
                 mappings[k] = v
                 if v.primary_key:
                     if primaryKey:
-                        raise RuntimeError("Duplicate primary key for field: %s" % k)
+                        raise StandardError("Duplicate primary key for field: %s" % k)
                     primaryKey = k
                 else:
                     fields.append(k)
         if not primaryKey:
-            raise RuntimeError("Primary key not found")
+            raise StandardError("Primary key not found")	#RuntimeError
         for k in mappings.keys():
             attrs.pop(k)
         esacFields = list(map(lambda f: '`%s`' % f, fields))
@@ -122,10 +130,6 @@ class ModelMetaclass(type):
         attrs['__delete__'] = 'delete from `%s` where `%s` = ?' % (tableName, primary)
         return type.__new(class, name, bases, attrs)
         
-
-
-
-
 class Model(dict, metaclass = ModleMetaclass):
     def __init__(self, **kw):
         super(Model, self).__init__(**kw)
@@ -164,6 +168,19 @@ class Model(dict, metaclass = ModleMetaclass):
 
     @classmethod
     @asyncio.coroutine
+    def findNumber(cls, selectField, where = None, args = None):
+        ' find number by select and where'
+        sql = ['select %s _num_ from `%s`' % (selectField, cls.__table__)]
+        if where:
+            sql.append('where')
+            sql.append(where)
+        rs = yield from select(' '.join(sql), args, 1)
+        if len(rs) == 0:
+            return None
+        return rs[0]['_num_']
+
+    @classmethod
+    @asyncio.coroutine
     def findAll(cls, where = None, args = None, **kw):
         ' find objects by "where clause"'
         sql = [cls.__select__]
@@ -174,10 +191,21 @@ class Model(dict, metaclass = ModleMetaclass):
             args = []
         orderBy = kw.get("orderBy", None)
         if orderBy:
-            sql.append('orderBy')
+            sql.append('order by')
             sql.append(orderBy)
-            
-
+        limit = kw.get("limit", None)
+        if limit is not None:
+            sql.append("limit")
+            if isinstance(limit, int):
+                sql.append('?')
+                args.append(limit)
+            elif isinstance(limit, truple) and len(limit) == 2:
+                sql.append('?, ?')
+                args.extend(limit)
+            else:
+                raise ValueError('Invalid limit value: %s' % str(limti))
+        rs = yield from select (" ".join(sql), args)
+        return [cls(**r) for r in rs]
 
 
     @asyncio.coroutine
@@ -190,20 +218,17 @@ class Model(dict, metaclass = ModleMetaclass):
     # user = User(id = 123, name = 'tuouo')
     # yield from user.save()
 
+    @asyncio.coroutine
+    def update(self):
+        args = list(map(self.getValue, self.__fields__))
+        args.append(self.getValue(self.__primarykey__))
+        rows = yield from execute(self.__update__, args)
+        if rows != 1:
+            logging.warn('failed to update record: affected rows: %s' % rows)
 
-    
-
-
-
-
-
-
-from orm import Model, StringField, IntegerField
-class User(Model):
-    __tables__ = 'users'
-    id = IntegerField(primary_key = True)
-    name = StringField()
-
-user = User(id = 123, name = 'tuouo')
-user.insert()
-users = User.findAll()
+    @asyncio.coroutine
+    def remove(self):
+        args = [self.getValue(self.__primaryKey__)]
+        rows = yield from execute(self.__delete__, args)
+        if rows != 1:
+            logging.warn('failed to remove by primary key record: affected rows: %s' % rows)
