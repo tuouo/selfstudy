@@ -6,17 +6,17 @@ def create_pool(loop, **kw):
     logging.info('create database connection pool ......')
     global __pool
     __pool = yield from aiomysql.create_pool(
-    	host	= kw.get('host', 'localhost'),
-    	port	= kw.get('port', '3306'),
-    	user	= kw['user'],
-    	password= kw['password'],
-    	db 		= kw['db'],
-    	charset = kw.get('charset', 'utf8'),
-    	autocommit = kw.get('autocommit', True),
-    	minsize	= kw.get('minsize', 1),
-    	maxsize	= kw.get('maxsize', 10),
-    	loop	= loop
-    	)
+        host	= kw.get('host', 'localhost'),
+        port	= kw.get('port', '3306'),
+        user	= kw['user'],
+        password= kw['password'],
+        db 		= kw['database'],
+        charset = kw.get('charset', 'utf8'),
+        autocommit = kw.get('autocommit', True),
+        minsize	= kw.get('minsize', 1),
+        maxsize	= kw.get('maxsize', 10),
+        loop	= loop
+        )
 
 def log(sql, args=()):
     logging.info('SQL: %s' % sql)
@@ -41,8 +41,8 @@ def execute(sql, args, autocommit = True):
     log(sql)		#log(sql, args)
     global __pool
     with (yield from __pool) as conn:
-    	if not autocomit:
-    	    yield from conn.begin()
+        if not autocomit:
+            yield from conn.begin()
         try:
             #cur = yield from conn.cursor()
             cur = yield from conn.curson(aiomysql.DictCursor)
@@ -52,8 +52,8 @@ def execute(sql, args, autocommit = True):
             if not autocomit:
                 yield from conn.commit()
         except BaseException as e:
-        	if not autocomit:
-        	    yield from conn.rollback()
+            if not autocomit:
+                yield from conn.rollback()
             raise 
         return affected
 
@@ -66,7 +66,7 @@ class Field(object):
         self.default = default
 
     def __str__(self):
-        return '<%s, %s:%s>' % (self.__class__.__name__, slef.colum_type, self.name)
+        return '<%s, %s:%s>' % (self.__class__.__name__, self.colum_type, self.name)
 
 class StringField(Field):
     def __init__(self, name = None, primary_key = False, default = None, ddl = 'varchar(100)'):
@@ -95,15 +95,15 @@ def creArgsStr(num):
     return ', '.join(l)
 
 class ModelMetaclass(type):
-    def __new__(class, name, bases, attrs):
-        if name = 'Model':									# ignore Model self
-            return type.__new(class, name, bases, attrs)	
+    def __new__(cls, name, bases, attrs):
+        if name == 'Model':									# ignore Model self
+            return type.__new__(cls, name, bases, attrs)	
         tableName = attrs.get('__table__', None) or name
         logging.info('found model: %s (table %s)' % (name, tableName))	
         mappings = dict()
         fields = []
         primaryKey = None
-        for k, v in attrs:
+        for k, v in attrs.items():
             if isinstance(v, Field):
                 logging.info("\tFound mapping: %s ==> %s" % (k, v))
                 mappings[k] = v
@@ -122,15 +122,15 @@ class ModelMetaclass(type):
         attrs['__table__'] = tableName
         attrs['__primaryKey__'] = primaryKey
         attrs['__fields__'] = fields
-        attrs['__select__'] = 'select `%s`, %s from `%s`' % (primary, ', '.join(esacFields), tableName)
+        attrs['__select__'] = 'select `%s`, %s from `%s`' % (primaryKey, ', '.join(esacFields), tableName)
         attrs['__insert__'] = 'insert into `%s` (%s, `%s`) values (%s)' % (tableName, 
-        	', '.join(esacFields), primary, creArgsStr(len(esacFields) + 1))
+        	', '.join(esacFields), primaryKey, creArgsStr(len(esacFields) + 1))
         attrs['__update__'] = 'update `%s` set %s where `%s` = ?' % (tableName, 
-        	', '.join(map(lambda f: '`%s` = ? ' % mappings.get(f).name or f, fields)), primary)
-        attrs['__delete__'] = 'delete from `%s` where `%s` = ?' % (tableName, primary)
-        return type.__new(class, name, bases, attrs)
+        	', '.join(map(lambda f: '`%s` = ? ' % mappings.get(f).name or f, fields)), primaryKey)
+        attrs['__delete__'] = 'delete from `%s` where `%s` = ?' % (tableName, primaryKey)
+        return type.__new__(cls, name, bases, attrs)
         
-class Model(dict, metaclass = ModleMetaclass):
+class Model(dict, metaclass = ModelMetaclass):
     def __init__(self, **kw):
         super(Model, self).__init__(**kw)
 
@@ -163,7 +163,7 @@ class Model(dict, metaclass = ModleMetaclass):
         rs = yield from select('%s where `%s` = ?' % (cls.__select__, cls.__primarykey__), [pk], 1)
         if len(rs) == 0:
             return None
-        return (**rs[0])
+        return cls(**rs[0])
     # user = yield from User.find('123')
 
     @classmethod
@@ -206,6 +206,10 @@ class Model(dict, metaclass = ModleMetaclass):
                 raise ValueError('Invalid limit value: %s' % str(limti))
         rs = yield from select (" ".join(sql), args)
         return [cls(**r) for r in rs]
+
+#user = User(id = 123, name = 'tuouo')
+#user.insert()
+#users = User.findAll()
 
 
     @asyncio.coroutine
