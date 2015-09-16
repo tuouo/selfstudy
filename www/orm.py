@@ -7,7 +7,7 @@ def create_pool(loop, **kw):
     global __pool
     __pool = yield from aiomysql.create_pool(
         host	= kw.get('host', 'localhost'),
-        port	= kw.get('port', '3306'),
+        port	= kw.get('port', 3306),
         user	= kw['user'],
         password= kw['password'],
         db 		= kw['database'],
@@ -29,7 +29,7 @@ def select(sql, args, size = None):
         cur = yield from conn.curson(aiomysql.DictCursor)
         yield from cur.execute(sql.replace('?', '%s'), args or ())	# without write sql str byself incase attack
         if size:
-            rs = yield from cur.fetchmany(size)
+            rs = yield from cur.fetchmany(size) 
         else:
             rs = yield from cur.fetchall()
         yield from cur.close()
