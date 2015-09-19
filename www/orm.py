@@ -41,18 +41,17 @@ def execute(sql, args, autocommit = True):
     log(sql)		#log(sql, args)
     global __pool
     with (yield from __pool) as conn:
-        if not autocomit:
+        if not autocommit:
             yield from conn.begin()
         try:
-            #cur = yield from conn.cursor()
-            cur = yield from conn.curson(aiomysql.DictCursor)
+            cur = yield from conn.cursor()
             yield from cur.execute(sql.replace('?', '%s'), args)
-            affected = cur.rowconut
+            affected = cur.rowcount
             yield from cur.close()
-            if not autocomit:
+            if not autocommit:
                 yield from conn.commit()
         except BaseException as e:
-            if not autocomit:
+            if not autocommit:
                 yield from conn.rollback()
             raise 
         return affected
@@ -118,9 +117,9 @@ class ModelMetaclass(type):
         for k in mappings.keys():
             attrs.pop(k)
         esacFields = list(map(lambda f: '`%s`' % f, fields))
-        attrs['__mapping__'] = mappings
+        attrs['__mappings__'] = mappings
         attrs['__table__'] = tableName
-        attrs['__primaryKey__'] = primaryKey
+        attrs['__primarykey__'] = primaryKey
         attrs['__fields__'] = fields
         attrs['__select__'] = 'select `%s`, %s from `%s`' % (primaryKey, ', '.join(esacFields), tableName)
         attrs['__insert__'] = 'insert into `%s` (%s, `%s`) values (%s)' % (tableName, 
@@ -135,10 +134,10 @@ class Model(dict, metaclass = ModelMetaclass):
         super(Model, self).__init__(**kw)
 
     def __getattr__(self, key):
-    	try:
-    	    return slef[key]
-    	except keyError:
-    	    raise AttributeError("'Model' object has no attribute '%s'" % key)
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError("'Model' object has no attribute '%s'" % key)
 
     def __setattr__(self, key ,value):
         self[key] = value
@@ -148,10 +147,10 @@ class Model(dict, metaclass = ModelMetaclass):
 
     def getDefaultValue(self, key):
         value = getattr(self, key, None)
-        if Value is None:
-            field  = self._mappings_[key]
+        if value is None:
+            field  = self.__mappings__[key]
             if field.default is not None:
-                value = field.default() if callable(field.default) else field.default()	#?_?, unnessary
+                value = field.default() if callable(field.default) else field.default	#?_?, unnessary
                 logging.debug('using default value for %s:%s' % (key, str(value)))
                 setattr(self, key, value)
         return value
@@ -232,7 +231,7 @@ class Model(dict, metaclass = ModelMetaclass):
 
     @asyncio.coroutine
     def remove(self):
-        args = [self.getValue(self.__primaryKey__)]
+        args = [self.getValue(self.__primarykey__)]
         rows = yield from execute(self.__delete__, args)
         if rows != 1:
             logging.warn('failed to remove by primary key record: affected rows: %s' % rows)
