@@ -3,7 +3,7 @@
 import asyncio, functools, inspect, logging, os
 from urllib import parse
 from aiohttp import web
-from apis import AIPError
+#from apis import AIPError
 
 def get(path):
     '''Define decorator @ get('/path')'''
@@ -49,12 +49,15 @@ def add_route(app, fn):
     app.router.add_route(mathod, path, RequestHandler(app, fn))
 
 def add_routes(app, module_name):
+    logging.info('in add_routes')
     n = module_name.rfind('.')
+    logging.info('n: %s' % n)
     if n == (-1):
         mod = __import__(module_name, globals(), locals())
     else:
         name = module_name[n + 1 :]
         mod = getattr(__import__(module_name[:n], globals(), locals(), [name]), name)
+    logging.info('before attr in dir')
     for attr in dir(mod):
         if attr.startswith('_'):
             continue
@@ -64,3 +67,8 @@ def add_routes(app, module_name):
             path = getattr(fn, '__path__', None)
             if method and path:
                 add_route(app,fn)
+
+def add_static(app):
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+    app.router.add_static('/static/', path)
+    logging.info('add static %s => %s' % ('/static/', path))
