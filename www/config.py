@@ -13,7 +13,7 @@ try:
     import config_override
     configs = merge(configs, config_override.configs)
 except ImportError:
-    pass	# if no config_override.py
+    pass    # if no config_override.py
 
 import DictSupportPoint as Dict
 configs = Dict.toDict(configs)
