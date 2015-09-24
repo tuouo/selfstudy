@@ -9,7 +9,7 @@ configs = {
         'port': 3306,
         'user': 'root',
         'password': '',
-        'db': 'awesome'
+        'database': 'awesome'
     },
     'session':{
         'secret': 'Awesome'
