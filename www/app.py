@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import logging; logging.basicConfig(level = logging.INFO)
-import asyncio, os, json, time
+from aiohttp import web
+from config import configs
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
-from aiohttp import web
 from coroweb import add_routes, add_static
+import logging; logging.basicConfig(level = logging.INFO)
+import asyncio, os, json, time
 import orm
 
 @asyncio.coroutine
 def init(loop):
-    yield from orm.create_pool(loop = loop, user = 'root', password = '', database = 'awesome')
+    yield from orm.create_pool(loop = loop, **configs.db)
+    #yield from orm.create_pool(loop = loop, user = 'root', password = '', database = 'awesome')
     app = web.Application(loop = loop, middlewares = [
     	logger_factory, response_factory
     ])
@@ -41,7 +43,7 @@ def response_factory(app, handler):
             return r
         if isinstance(r, bytes):
             resp = web.Response(body = r)
-            resp.content_type = 'appliaction/octet-stream'
+            resp.content_type = 'application/octet-stream'
             return resp
         if isinstance(r, str):
             if r.startswith('redirect:'):
@@ -73,6 +75,20 @@ def response_factory(app, handler):
     logging.info("response ok...")
     return response
 
+@asyncio.coroutine
+def data_factory(app,handler):
+    @asyncio.coroutine
+    def parse_data(request):
+        if request.method == "POST":
+            if request.content_type.startswith('application/json'):
+                request.__data__ = yield from request.json()
+                logging.info("request json: %s" % str(request.__data__))
+            elif request.content_type.startswith('application/x-www-form-urlencoded'):
+                request.__data__ = yield from request.post()
+                logging.info("request from: %s" % str(request.__data__))
+        return (yield from handler(request))
+    return parse_data
+
 
 def init_jinja2(app, **kw):
     logging.info("init jinja2...")
@@ -88,7 +104,7 @@ def init_jinja2(app, **kw):
     if path is None:
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
     logging.info('set jinja2 template path: %s' % path)
-    env = Environment(loader=FileSystemLoader(path), **options)
+    env = Environment(loader=FileSystemLoader(path), ** options)
     filters = kw.get('filters', None)
     if filters is not None:
         for name, f in filters.items():
