@@ -132,7 +132,7 @@ class ModelMetaclass(type):
 class Model(dict, metaclass = ModelMetaclass):
     def __init__(self, **kw):
         super(Model, self).__init__(**kw)
-        logging.info('model init')  
+        logging.info('in Model-orm: model init')  
 
     def __getattr__(self, key):
         try:
