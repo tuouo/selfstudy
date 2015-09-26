@@ -26,7 +26,7 @@ def select(sql, args, size = None):
     log(sql, args)
     global __pool
     with (yield from __pool) as conn:								# once yield from, need everywhere
-        cur = yield from conn.curson(aiomysql.DictCursor)
+        cur = yield from conn.cursor(aiomysql.DictCursor)
         yield from cur.execute(sql.replace('?', '%s'), args or ())	# without write sql str byself incase attack
         if size:
             rs = yield from cur.fetchmany(size) 
@@ -132,6 +132,7 @@ class ModelMetaclass(type):
 class Model(dict, metaclass = ModelMetaclass):
     def __init__(self, **kw):
         super(Model, self).__init__(**kw)
+        logging.info('in Model-orm: model init')  
 
     def __getattr__(self, key):
         try:

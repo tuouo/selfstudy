@@ -2,8 +2,8 @@
 # -*- coidng: utf-8 -*-
 '''Simple dict with support access as x.y style'''
 
-class Dict():
-    def __init__(self, names(), values(), **kw):
+class Dict(dict):
+    def __init__(self, names = (), values = (), **kw):
         super(Dict, self).__init__(**kw)
         for k, v in zip(names, values):
             self[k] = v
@@ -18,7 +18,7 @@ class Dict():
         self[key] = value
 
 def toDict(d):
-    D = Dict():
+    D = Dict()
     for k, v in d.items():
         D[k] = toDict(v) if isinstance(v, dict) else v
     return D
