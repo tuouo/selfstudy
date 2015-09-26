@@ -8,7 +8,7 @@ from models import User, Comment, Blog, next_id
 
 @get('/')
 def index(request):
-    logging.info('url handlers	index')
+    logging.info('in index-handlers: url handlers	index')
     users = yield from User.findAll()
     logging.info('in index:User ok.')
     return {
