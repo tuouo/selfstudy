@@ -23,6 +23,7 @@ def init(loop):
     logging.info('server started at http://127.0.0.1:9000 ...')
     return srv
 
+# factory excute by order
 @asyncio.coroutine
 def logger_factory(app, handler):
     @asyncio.coroutine
@@ -32,13 +33,26 @@ def logger_factory(app, handler):
     return logger
 
 @asyncio.coroutine
+def data_factory(app,handler):
+    @asyncio.coroutine
+    def parse_data(request):
+        if request.method == "POST":
+            if request.content_type.startswith('application/json'):
+                request.__data__ = yield from request.json()
+                logging.info("request json: %s" % str(request.__data__))
+            elif request.content_type.startswith('application/x-www-form-urlencoded'):
+                request.__data__ = yield from request.post()
+                logging.info("request from: %s" % str(request.__data__))
+        return (yield from handler(request))
+    return parse_data
+
+@asyncio.coroutine
 def response_factory(app, handler):
     @asyncio.coroutine
     def response(request):
         logging.info("Response handle...%s..." % request)
-        logging.info("handler: %s" % handler)
         r = yield from handler(request)
-        logging.info("r: %s" % r)
+        logging.info('response_factory: get handlers response OK here')
         if isinstance(r, web.StreamResponse):
             return r
         if isinstance(r, bytes):
@@ -75,20 +89,6 @@ def response_factory(app, handler):
     logging.info("response ok...")
     return response
 
-@asyncio.coroutine
-def data_factory(app,handler):
-    @asyncio.coroutine
-    def parse_data(request):
-        if request.method == "POST":
-            if request.content_type.startswith('application/json'):
-                request.__data__ = yield from request.json()
-                logging.info("request json: %s" % str(request.__data__))
-            elif request.content_type.startswith('application/x-www-form-urlencoded'):
-                request.__data__ = yield from request.post()
-                logging.info("request from: %s" % str(request.__data__))
-        return (yield from handler(request))
-    return parse_data
-
 
 def init_jinja2(app, **kw):
     logging.info("init jinja2...")
@@ -103,7 +103,7 @@ def init_jinja2(app, **kw):
     path = kw.get('path',  None)
     if path is None:
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-    logging.info('set jinja2 template path: %s' % path)
+    logging.info('jinja2 template path: %s' % path)
     env = Environment(loader=FileSystemLoader(path), ** options)
     filters = kw.get('filters', None)
     if filters is not None:
