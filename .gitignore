@@ -3,6 +3,7 @@ www/unskilled.py
 www/user.py
 
 # My resource
+www/static/fontsEx
 
 # Cache
 www/__pycache__/
