@@ -114,15 +114,15 @@ def init_jinja2(app, **kw):
 def datetime_filter(t):
     delta = int(time.time() - t)
     if delta < 60:
-        return 'In one minute'
+        return '一分钟内'#'In one minute'
     if delta < 3600:
-        return '%s minutes ago' % (delta // 60)
+        return '%s 分钟前' % (delta // 60)#'%s minutes ago' % (delta // 60)
     if delta < 86400:
-        return '%s hours ago' % (delta // 3600)
+        return '%s 小时前' % (delta // 3600)#'%s hours ago' % (delta // 3600)
     if delta < 604800:
-        return '%s days ago' % (delta // 86400)
-    dt = datetime.formatimestamp(t)
-    return '%s(Y)-%s(M)-%s(D)' % (dt.year, dt.month, dt.day)
+        return '%s 天前' % (delta // 86400)#'%s days ago' % (delta // 86400)
+    dt = datetime.fromtimestamp(t)
+    return '%s年-%s月-%s日' % (dt.year, dt.month, dt.day)#'%s(Y)-%s(M)-%s(D)' % (dt.year, dt.month, dt.day)
 
 
 loop = asyncio.get_event_loop()
