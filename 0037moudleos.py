@@ -16,6 +16,7 @@ abspath = os.path.join(abspath, 'testdir')
 print(abspath)
 print(os.mkdir(abspath))	# None, if file already exist, --> FileExistsError
 print(os.rmdir(abspath))	# None
+print()
 
 # abspath needn't really exist, methods which under treat abspathas str
 print(os.path.split(abspath))
@@ -31,8 +32,8 @@ print(abspath)
 
 abspath = os.path.abspath('.')
 print(abspath)
-os.rename('test.txt', 'texttest.txt')
-os.rename('texttest.txt', 'test.txt')
+#os.rename('test.txt', 'texttest.txt')
+#os.rename('texttest.txt', 'test.txt')
 
 #print([x for x in os.listdir('.')])	# show all File in current path 
 print([x for x in os.listdir('.') if os.path.isdir(x)])
