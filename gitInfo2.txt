@@ -32,7 +32,7 @@ git checkout dev		(切换到某分支)
 
 git branch				(查看分支，当前分支有*前缀)
 
-只能在master分支上，合并dev分支的进度
+只能在master分支上，合并dev分支的进度   #当时测试结果，应该有问题
 git checkout master
 git merge dev
 

@@ -31,7 +31,7 @@ git config --global user.email "exampl@example.com"
 	back to leatest add or commit.
 	
 13. git reset HEAD fileName.XXX
-	drop add
+	unstage
 	
 14. git rm fileName.XXX
 	delete fileName.XXX
