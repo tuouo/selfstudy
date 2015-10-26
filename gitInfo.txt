@@ -37,3 +37,8 @@ git config --global user.email "exampl@example.com"
 	delete fileName.XXX
 	git commit -m "message"
 	commit needed
+	
+	rm fileName.XXX
+	git commit -am "abc"
+	use -am
+	
