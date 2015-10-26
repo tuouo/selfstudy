@@ -1,3 +1,8 @@
+20161026增加
+git mv fileName.XXX FileName
+移动fileName.XXX到同层文件FileName下
+git mv fileName.XXX ..
+移动fileName.XXX到上级文件目录
 
 远程仓库
 本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，所以，需要一点设置：
