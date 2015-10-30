@@ -1,23 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>The animal of Earth</title>
+	<title>The Animal of Earth</title>
 	<link rel="stylesheet" type="text/css" href="uikit/css/uikit.almost-flat.min.css">
+	<link rel="stylesheet" type="text/css" href="uikit/css/components/sticky.almost-flat.min.css">
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="uikit/js/uikit.min.js"></script>
+	<script type="text/javascript" src="uikit/js/components/sticky.min.js"></script>
+
+	<style type="text/css">
+		.uk-navbar-nav > li:not(.uk-active) > a:focus {
+			background-color: inherit;
+			border-left-color: rgba(0,0,0,0);
+			border-right-color: rgba(0,0,0,0);
+		}
+	</style>
+	
+	
+</div>
 </head>
 <body>
 	<div class="uk-container uk-container-center uk-margin-top">
 
 		<!-- Navigation -->
-		<nav class="uk-navbar">
-			<a href="#" class="uk-navbar-brand">The Animal of Earth</a>
-			<ul class="uk-navbar-nav">
+		<nav class="uk-navbar" data-uk-sticky="{clsactive: 'uk-navbar-attached', top: -100, 
+		animation: 'uk-animation-slide-top'}">
+			<a href="#" class="uk-navbar-brand uk-visible-large">The Animal of Earth</a>
+			<ul class="uk-navbar-nav uk-visible-large" data-uk-scrollspy-nav="{closest: 'li', smoothscroll: {offset :50 }}">
 				<li><a href="#BCG"> Birds China Guilin </a></li>				
 				<li><a href="#BNM"> Black Naped Monarch </a></li>				
 				<li><a href="#CTV"> Coal Tit Video </a></li>				
 			</ul>
+			<a href="#offcanvas" class="uk-navbar-toggle uk-hidden-large" data-uk-offcanvas></a>			
+			<a href="#" class="uk-navbar-brand uk-navbar-center uk-hidden-large">Animals</a>
 		</nav>
+
 
 		<!-- Content -->
 		<h1 class="uk-text-center" id="BCG">Birds China Guilin</h1>
@@ -111,8 +128,18 @@
 		</div>
 
 		<footer class="uk-text-center uk-margin-large">
-			<a href="#">To Top</a>
+			<a href="#" data-uk-smooth-scroll>To Top</a>
 		</footer>
+
+		<div id="offcanvas" class="uk-offcanvas">
+		    <div class="uk-offcanvas-bar">
+		    	<ul class="uk-nav uk-nav-offcanvas">
+					<li><a href="#BCG"> Birds China Guilin </a></li>				
+					<li><a href="#BNM"> Black Naped Monarch </a></li>				
+					<li><a href="#CTV"> Coal Tit Video </a></li>				
+				</ul>
+		    </div>
+		</div>
 	</div>
 </body>
 </html>
