@@ -8,7 +8,7 @@ from models import User, Comment, Blog, next_id
 from apis import  APIValueError, APIResourceNotFoundError
 from config import configs
 
-#import markdown2
+import markdown2
 from aiohttp import web
 
 COOKIE_NAME = 'awesession'
