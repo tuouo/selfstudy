@@ -15,7 +15,7 @@ COOKIE_NAME = 'awesession'
 _COOKIE_KEY = configs.session.secret
 
 @get('/test')
-def index(request):
+def test(request):
     logging.info('in index-handlers: url handlers	index')
     users = yield from User.findAll()
     logging.info('in index:User ok.')
