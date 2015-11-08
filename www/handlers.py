@@ -45,7 +45,7 @@ def index(request):
         'blogs': blogs
     }
 
-@get('/api/users')
+@get('/api/all')
 def api_get_user(*, page = '1'):
     #page_index = get_page_index(page)
     #num = yield from User.findNumber('count(id)')
@@ -64,25 +64,12 @@ def register():
         '__template__': 'register.html'
     }
 
-@get('/signin')
-def signin():
-    return {
-        '__template__': 'signin.html'
-    }
-
-@get('/signout')
-def signout():
-    referer = request.header.get('Referer')
-    r = web.HTTPFound(referer or '/')
-    r.set_cookie(COOKIE_NAME, '-deleted-', max_age = 0, httponly = True)
-    logging.info('user signed out.')
-    return r
-
 _RE_EMAIL = re.compile(r'^[a-z0-9\.\-_]+\@[a-z0-9\-_]+(\.[a-z0-9\-\_]+){1,4}$')
 _RE_SHA1 = re.compile(r'^[0-9a-f]{40}$')
 
 @post('/api/users')
 def api_register_user(*, email, name, password):
+    logging.info('---------------in api_register_user.')
     if not name or not name.strip():
         raise APIValueError('name')
     if not email or not _RE_EMAIL.match(email):
@@ -90,6 +77,7 @@ def api_register_user(*, email, name, password):
     if not password or not _RE_SHA1.match(_RE_SHA1):
         raise APIValueError('_RE_SHA1')
     users = yield from User.findAll('email=?',  [email])
+    logging.info('register_user now is ok.')
     if len(users) > 0:
         raise APIError('register:failed', 'email', 'Email is already in use.')
     uid = next_id()
@@ -104,6 +92,20 @@ def api_register_user(*, email, name, password):
     user.password = '******'
     r.content_type = 'application/json'
     r.body = json.dumps(user, ensure_ascii = False).encode('utf-8')
+    return r
+
+@get('/signin')
+def signin():
+    return {
+        '__template__': 'signin.html'
+    }
+
+@get('/signout')
+def signout(request):
+    referer = request.header.get('Referer')
+    r = web.HTTPFound(referer or '/')
+    r.set_cookie(COOKIE_NAME, '-deleted-', max_age = 0, httponly = True)
+    logging.info('user signed out.')
     return r
 
 @post('/api/authenticate')
