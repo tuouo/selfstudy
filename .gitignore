@@ -3,7 +3,6 @@ www/unskilled.py
 www/user.py
 
 # My resource
-www/static
 www/uikit
 
 # Cache
