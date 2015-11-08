@@ -5,7 +5,7 @@
 {% block beforehead %}
 <script>
 function validateEmail(email){
-	var re = /^[a-z0-9\.\-\_] + \@[a-z0-9\-\_] + (\.[a-z0-9\-\_] + ){1,4} $/;
+    var re = /^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$/;
 	return re.test(email.toLowerCase());
 }
 $(function (){
@@ -20,7 +20,7 @@ $(function (){
 		methods: {
 			submit: function (enent){
 				event.preventDefault();
-				var $from = $('#vm');
+				var $form = $('#vm');
 				if (! this.name.trim()) {
                     return $form.showFormError('请输入名字');
                 }
@@ -34,15 +34,15 @@ $(function (){
                     return $form.showFormError('两次输入的口令不一致');
                 }
                 var email = this.email.trim().toLowerCase();
-                $form.postJSON('/api/users',{
+                $form.postJSON('/api/reg',{
                 	name: this.name.trim(),
                 	email: email,
                 	password : CryptoJS.SHA1(email + ':' + this.password1).toString()
-                }, functin (err, r) {
+                }, function (err, r) {
                 	if (err){
                 		return $form.showFormError(err);
                 	}
-                	returnlocation.assign('/');
+                	return location.assign('/');
                 });
 			}
 		}
