@@ -15,7 +15,7 @@ def _format_addr(s):
 # to_addr = input("To: ")
 # smtp_sever = input("SMTP server: ")
 from_addr = 'ltytuotuo@gmail.com'
-password = '503307google'
+password = ''
 to_addr = 'ltytuotuo@163.com'
 smtp_sever = 'smtp.gmail.com'
 #smtp_sever = 'smtp.163.com'
