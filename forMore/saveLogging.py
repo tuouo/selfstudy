@@ -10,7 +10,7 @@ logging.basicConfig(
 	)
 
 ##########################################################
-# This is contribute to console only
+# This is contribute to console onlyg
 console = logging.StreamHandler()
 console.setLevel(logging.WARNING)
 formatter = logging.Formatter('%(name)-12s: %(message)s')
