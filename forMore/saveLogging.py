@@ -9,11 +9,14 @@ logging.basicConfig(
     filemode = 'w'
 	)
 
+##########################################################
+# This is contribute to console only
 console = logging.StreamHandler()
-console.setLevel(logging.INFO)
+console.setLevel(logging.WARNING)
 formatter = logging.Formatter('%(name)-12s: %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
+##########################################################
 
 logging.info("This is logging test of INFO")
 logging.debug("This is logging test of debug")
