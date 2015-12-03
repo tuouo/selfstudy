@@ -31,5 +31,9 @@ class tApproximate(unittest.TestCase):
         self.assertEqual(approximate_size(1000000000000, False), '1.00 TB')
         self.assertEqual(approximate_size(1000000000000), '931.32 GiB')        
 
+
 if __name__ == '__main__':
+    print('1000{0[0]} = 1{0[1]}, not {1[1]}'.format(suffixes[1000], suffixes[1024]))
     unittest.main()
+    # not reach here
+    print('not reach here')
