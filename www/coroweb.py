@@ -1,31 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8-*-
-import asyncio, functools, inspect, logging, os
+import logging; logging.basicConfig(level = logging.INFO)
+import asyncio, functools, inspect, os
 from urllib import parse
 from aiohttp import web
 from apis import APIError
 
 def get(path):
-    '''Define decorator @ get('/path')'''
+    '''Define decorator @get('/path')'''
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
             return func(*args, **kw)
         wrapper.__method__ = 'GET'
-        wrapper.__route__ = path
-        logging.info('in get, coroweb')
+        wrapper.__route__  = path
+        logging.info('   GET(coroweb). %s' % path)
         return wrapper
     return decorator
 
 def post(path):
-    '''Define decorator @post('/post')'''
+    '''Define decorator @post('/path')'''
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
             return func(*args, **kw)
-        wrapper.__mathod__ = 'POST'
-        wrapper.__route__ = path
-        logging.info('in post, coroweb')
+        wrapper.__method__ = 'POST'
+        wrapper.__route__  = path
+        logging.info('   POST(coroweb). %s' % path)
         return wrapper
     return decorator
 
@@ -77,7 +78,7 @@ def get_required_kw_args(fn):
 class RequestHandler(object):
     def __init__(self, app, fn):
         self._app = app
-        self._fn = fn
+        self._fn = fn           #  #   #
         self._has_request_arg = has_request_arg(fn)
         self._has_var_kw_arg = has_var_kw_arg(fn)
         self._has_named_kw_args = has_named_kw_args(fn)
@@ -93,7 +94,7 @@ class RequestHandler(object):
                     return web.HTTPBadRequest('Missing content-type')
                 ct = request.content_type.lower()
                 if ct.startswith('application/json'):
-                    parmas = yield from request.json()
+                    params = yield from request.json()
                     if not isinstance(params, dict):
                         return web.HTTPBadRequest('JSON body must be object.')
                     kw = params
@@ -108,13 +109,13 @@ class RequestHandler(object):
                     kw = dict()
                     for k, v in parse.parse_qs(qs, True).items():
                         kw[k] = v[0]
-        if kw == None:
+        if kw is None:
             kw = dict(**request.match_info)
         else:
             if not self._has_var_kw_arg and self._named_kw_args:
                 # remove all unnamed kw
                 copy = dict()
-                for name in _named_kw_args:
+                for name in self._named_kw_args:
                     if name in kw:
                         copy[name] = kw[name]
                 kw = copy
@@ -140,12 +141,12 @@ class RequestHandler(object):
 def add_route(app, fn):
     method = getattr(fn, '__method__', None)
     path = getattr(fn, '__route__', None)
-    logging.info('method:%s\tpath:%s' %(method, path))
+    logging.info('\tmethod:%s\tpath:%s' %(method, path))
     if method is None or path is None:
         raise ValueError('@get or @post not defined in %s.' % str(fn))
     if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
         fn = asyncio.coroutine(fn)
-    logging.info('add rout %s %s => %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
+    logging.info('\tadd rout %s %s => %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
     app.router.add_route(method, path, RequestHandler(app, fn))
 
 def add_routes(app, module_name):
@@ -156,16 +157,18 @@ def add_routes(app, module_name):
     else:
         name = module_name[n + 1 :]
         mod = getattr(__import__(module_name[:n], globals(), locals(), [name]), name)
-    logging.info('before attr in dir')
+    logging.info('\n\tadd_routes, before attr in dir')
     for attr in dir(mod):
         if attr.startswith('_'):
             continue
         fn = getattr(mod, attr)
         if callable(fn):
             method = getattr(fn, '__method__', None)
-            path = getattr(fn, '__route__', None)
+            path = getattr(fn, '__route__', None)            
+            logging.info('****%s,%s,%s' % (attr, method, path))
             if method and path:
                 add_route(app,fn)
+    logging.info('\tadd_routes, attr in dir, end')
 
 def add_static(app):
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')

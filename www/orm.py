@@ -55,7 +55,7 @@ def execute(sql, args, autocommit = True):
                 yield from conn.rollback()
             raise 
         return affected
-
+        
 
 class Field(object):
     def __init__(self, name, colum_type, primary_key, default):
@@ -98,13 +98,13 @@ class ModelMetaclass(type):
         if name == 'Model':									# ignore Model self
             return type.__new__(cls, name, bases, attrs)	
         tableName = attrs.get('__table__', None) or name
-        logging.info('found model: %s (table %s)' % (name, tableName))	
+        logging.info('\tfound model: %s (table %s)' % (name, tableName))	
         mappings = dict()
         fields = []
         primaryKey = None
         for k, v in attrs.items():
             if isinstance(v, Field):
-                logging.info("\tFound mapping: %s ==> %s" % (k, v))
+                logging.info("Mapping:\t%s ==> %s" % (k, v))
                 mappings[k] = v
                 if v.primary_key:
                     if primaryKey:

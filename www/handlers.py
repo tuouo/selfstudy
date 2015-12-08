@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 ' url handlers'
 
-import re, time, json, logging, hashlib, base64, asyncio
+import logging; logging.basicConfig(level = logging.INFO)
+import re, time, json, hashlib, base64, asyncio
 from coroweb import get, post
 from models import User, Comment, Blog, next_id
-from apis import  APIValueError, APIResourceNotFoundError
+from apis import  APIValueError, APIResourceNotFoundError, Page
 from config import configs
 
 import markdown2
@@ -13,6 +14,66 @@ from aiohttp import web
 
 COOKIE_NAME = 'awesession'
 _COOKIE_KEY = configs.session.secret
+
+def check_admin(request):
+    if request.__user__ is None or not request.__user__.admin:
+        raise APIPermissionError()
+
+def get_page_index(page_str):
+    p = 1
+    try:
+        p = int(page_str)
+    except ValueError as e:
+        pass
+    if p < 1:
+        p = 1
+    return p
+
+def user2cookie(user, max_age):
+     '''
+     Generate cookie str by user.
+     '''
+     expires = str(int(time.time() + max_age))
+     s = '%s-%s-%s-%s' % (user.id, user.password, expires, _COOKIE_KEY)
+     L = [user.id, expires, hashlib.sha1(s.encode('utf-8')).hexdigest()]
+     return '-'.join(L)
+
+def text2html(text):
+    lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'), filter(lambda s: s.strip() != '', text.split('\n')))
+    return ''.join(lines)
+
+def text2html(text):
+    lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'), filter(lambda s: s.strip() != '', text.split('\n')))
+    return ''.join(lines)
+
+@asyncio.coroutine
+def cookie2user(cookie_str):
+    '''
+    Parse cookie and load user when cookie is valid.
+    '''
+    if not cookie_str:
+        return None
+    try:
+        L = cookie_str.split('-')
+        if len(L) != 3:
+            return None
+        uid, expires, sha1 = L
+        if int(expires) < time.time():
+            return None
+        user = yield from User.find(uid)
+        if user is None:
+            return None
+        s = '%s-%s-%s-%s' % (uid, user.password, expires, _COOKIE_KEY)
+        if sha1 != hashlib.sha1(s.encode('utf-8')).hexdigest():
+            logging.info('invalid sha1 when decode')
+            return None
+        user.password = '******'
+        return user
+    except Exception as e:
+        logging.exception(e)
+        return None
+
+
 
 @get('/test')
 def test(request):
@@ -74,16 +135,16 @@ def api_register_user(*, email, name, password):
         raise APIValueError('name')
     if not email or not _RE_EMAIL.match(email):
         raise APIValueError('email')
-    if not password or not _RE_SHA1.match(_RE_SHA1):
+    if not password or not _RE_SHA1.match(password):
         raise APIValueError('_RE_SHA1')
     users = yield from User.findAll('email=?',  [email])
     logging.info('register_user now is ok.')
     if len(users) > 0:
         raise APIError('register:failed', 'email', 'Email is already in use.')
     uid = next_id()
-    sha1_password = '%S:%S' % (uid, password)
+    sha1_password = '%s:%s' % (uid, password)
     user = User(id = uid, name = name.strip(), email = email,
-     password = hashlib.sha1(sha1_password.encode('utf-8').hexdigest()),
+     password = hashlib.sha1(sha1_password.encode('utf-8')).hexdigest(),
      image = 'http://www.gravatar.com/avatar/%s?d=mm&s=120' % hashlib.md5(email.encode('utf-8')).hexdigest())
     yield from user.save()
     # make session cookie:
@@ -134,38 +195,3 @@ def authenticate(*, email, password):
     return r
 
 
-def user2cookie(user, max_age):
-     '''
-     Generate cookie str by user.
-     '''
-     expires = str(int(time.time() + max_age))
-     s = '%s-%s-%s-%s' % (uid, user.password, expires, _COOKIE_KEY)
-     L = [user.id, expires, hashlib.sha1(s.encode('utf-8')).hexdigest]
-     return '-'.join(L)
-
-@asyncio.coroutine
-def cookie2user(cookie_str):
-    '''
-    Parse cookie and load user when cookie is valid.
-    '''
-    if not cookie_str:
-        return None
-    try:
-        L = cookie_str.split('-')
-        if len(L) != 3:
-            return None
-        uid, expires, sha1 = L
-        if int(expires) < time.time():
-            return None
-        user = yield from User.find(uid)
-        if user is None:
-            return None
-        s = '%s-%s-%s-%s' % (uid, user.password, expires, _COOKIE_KEY)
-        if sha1 != hashlib.sha1(s.encode('utf-8')).hexdigest():
-            logging.info('invalid sha1 when decode')
-            return None
-        user.password = '******'
-        return user
-    except Exception as e:
-        logging.exception(e)
-        return None
