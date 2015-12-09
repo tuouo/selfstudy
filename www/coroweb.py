@@ -60,7 +60,7 @@ def has_named_kw_args(fn):
 def get_named_kw_args(fn):
     args = []
     params = inspect.signature(fn).parameters
-    for name, param in params.items():
+    for name, param in params.items():       # This is come from handlers.py
         if param.kind == inspect.Parameter.KEYWORD_ONLY:
            args.append(name)
     return tuple(args)
@@ -87,8 +87,10 @@ class RequestHandler(object):
 
     @asyncio.coroutine
     def __call__(self, request):
+        logging.info("\tcoroweb -- RequestHandler -- __call__")
         kw = None
         if self._has_var_kw_arg or self._has_named_kw_args or self._required_kw_args:
+            logging.info("request.method: %s" % request.method)
             if request.method == 'POST':
                 if not request.content_type:
                     return web.HTTPBadRequest('Missing content-type')
@@ -119,6 +121,7 @@ class RequestHandler(object):
                     if name in kw:
                         copy[name] = kw[name]
                 kw = copy
+                logging.info("call with args: %s" % str(kw))
             for k, v in request.match_info.items():
                 # check named arg:
                 if k in kw:
@@ -146,18 +149,18 @@ def add_route(app, fn):
         raise ValueError('@get or @post not defined in %s.' % str(fn))
     if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
         fn = asyncio.coroutine(fn)
-    logging.info('\tadd rout %s %s => %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
+    logging.info('\tAdd %s-%s >> %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
     app.router.add_route(method, path, RequestHandler(app, fn))
 
 def add_routes(app, module_name):
     n = module_name.rfind('.')
-    logging.info('in add_routes(n: %s)' % n)
+    logging.info('\tcoroweb --> add_routes (n: %s)' % n)
     if n == (-1):
         mod = __import__(module_name, globals(), locals())
     else:
         name = module_name[n + 1 :]
         mod = getattr(__import__(module_name[:n], globals(), locals(), [name]), name)
-    logging.info('\n\tadd_routes, before attr in dir')
+    logging.info('\tadd_routes, before attr in dir')
     for attr in dir(mod):
         if attr.startswith('_'):
             continue
@@ -165,10 +168,10 @@ def add_routes(app, module_name):
         if callable(fn):
             method = getattr(fn, '__method__', None)
             path = getattr(fn, '__route__', None)            
-            logging.info('****%s,%s,%s' % (attr, method, path))
+            logging.info('****%s, %s, %s' % (attr, method, path))
             if method and path:
                 add_route(app,fn)
-    logging.info('\tadd_routes, attr in dir, end')
+    logging.info('\tadd_routes, attr in dir, End\n')
 
 def add_static(app):
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')

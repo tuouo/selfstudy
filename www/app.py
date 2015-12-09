@@ -12,7 +12,9 @@ import orm
 
 @asyncio.coroutine
 def init(loop):
+    logging.info('before create_pool')
     yield from orm.create_pool(loop = loop, **configs.db)
+    logging.info('after create_pool\n')
     #yield from orm.create_pool(loop = loop, user = 'root', password = '', database = 'awesome')
     app = web.Application(loop = loop, middlewares = [
         logger_factory, auth_factory, response_factory
@@ -37,9 +39,10 @@ def logger_factory(app, handler):
 def auth_factory(app, handler):
     @asyncio.coroutine
     def auth(request):
-        logging.info('check user: %s %s' % (request.method, request.path))
+        logging.info('\tcheck user: %s %s' % (request.method, request.path))
         request.__user__ = None
         cookie_str = request.cookies.get(COOKIE_NAME)
+        logging.info('\tcookie_str: %s' % cookie_str)
         if cookie_str:
             user = yield from cookie2user(cookie_str)
             if user:
@@ -56,7 +59,8 @@ def response_factory(app, handler):
     def response(request):
         logging.info("\tResponse handle...%s..." % request)
         r = yield from handler(request)
-        logging.info('\tresponse_factory: get handlers response OK here')
+        logging.info('response_factory: get handlers response OK here')
+        logging.info('type(response): %s' % type(r))
         if isinstance(r, web.StreamResponse):
             return r
         if isinstance(r, bytes):
@@ -91,7 +95,7 @@ def response_factory(app, handler):
         resp = web.Response(body = str(r).encode('utf-8'))
         resp.content_type = 'text/pain;charset=utf-8'
         return resp
-    logging.info("\tresponse ok...\n")
+    logging.info("*********************response ok*********************")
     return response
 
 @asyncio.coroutine
@@ -110,7 +114,7 @@ def data_factory(app,handler):
 
 
 def init_jinja2(app, **kw):
-    logging.info("init jinja2...")
+    logging.info("\tinit jinja2...")
     options = dict(
         autoescape = kw.get('autoescape', True),
         block_start_string = kw.get('block_start_string', '{%'),

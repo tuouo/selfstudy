@@ -77,9 +77,8 @@ def cookie2user(cookie_str):
 
 @get('/test')
 def test(request):
-    logging.info('in index-handlers: url handlers	index')
+    logging.info('findAll, /test')
     users = yield from User.findAll()
-    logging.info('in index:User ok.')
     return {
         '__template__': 'test.html',
         'users': users
@@ -170,7 +169,9 @@ def signout(request):
     return r
 
 @post('/api/authenticate')
-def authenticate(*, email, password):
+def authenticate(*, email, passwd):
+    password = passwd
+    logging.info('In authenticate.')
     if not email:
         raise APIValueError('email', 'Invalid email.')
     if not password:

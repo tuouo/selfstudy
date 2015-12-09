@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import aiomysql, asyncio, logging
+import logging; logging.basicConfig(level = logging.INFO)
+import aiomysql, asyncio
 @asyncio.coroutine
 def create_pool(loop, **kw):
     logging.info('create database connection pool ......')
@@ -95,6 +96,7 @@ def creArgsStr(num):
 
 class ModelMetaclass(type):
     def __new__(cls, name, bases, attrs):
+        logging.info('\t\torm.py --> ModelMetaclass --> __new__')
         if name == 'Model':									# ignore Model self
             return type.__new__(cls, name, bases, attrs)	
         tableName = attrs.get('__table__', None) or name
