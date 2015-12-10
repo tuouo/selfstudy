@@ -121,7 +121,6 @@ class RequestHandler(object):
                     if name in kw:
                         copy[name] = kw[name]
                 kw = copy
-                logging.info("call with args: %s" % str(kw))
             for k, v in request.match_info.items():
                 # check named arg:
                 if k in kw:

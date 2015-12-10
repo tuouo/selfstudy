@@ -34,8 +34,8 @@ def user2cookie(user, max_age):
      Generate cookie str by user.
      '''
      expires = str(int(time.time() + max_age))
-     s = '%s-%s-%s-%s' % (user.id, user.password, expires, _COOKIE_KEY)
-     L = [user.id, expires, hashlib.sha1(s.encode('utf-8')).hexdigest()]
+     s = '%s-%s-%s-%s' % (user.user_id, user.password, expires, _COOKIE_KEY)
+     L = [user.user_id, expires, hashlib.sha1(s.encode('utf-8')).hexdigest()]
      return '-'.join(L)
 
 def text2html(text):
@@ -93,12 +93,12 @@ def index(request):
     test4 = "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
     test5 = "Excepteur sint occaecat cupidatat non proident,sunt in culpa qui officia deserunt mollit anim id est laborum."
     blogs = [
-        Blog(id ='1', name = 'Story', summary = story, created_at = time.time() - 12000000),
-        Blog(id ='2', name = 'test1', summary = test1, created_at = time.time() - 240000),
-        Blog(id ='3', name = 'test2', summary = test2, created_at = time.time() - 3600),
-        Blog(id ='4', name = 'test3', summary = test3, created_at = time.time() - 720),
-        Blog(id ='5', name = 'test4', summary = test4, created_at = time.time() - 600),
-        Blog(id ='6', name = 'test5', summary = test5, created_at = time.time() - 12)
+        Blog(blog_id ='1', name = 'Story', summary = story, created_at = time.time() - 12000000),
+        Blog(blog_id ='2', name = 'test1', summary = test1, created_at = time.time() - 240000),
+        Blog(blog_id ='3', name = 'test2', summary = test2, created_at = time.time() - 3600),
+        Blog(blog_id ='4', name = 'test3', summary = test3, created_at = time.time() - 720),
+        Blog(blog_id ='5', name = 'test4', summary = test4, created_at = time.time() - 600),
+        Blog(blog_id ='6', name = 'test5', summary = test5, created_at = time.time() - 12)
     ]
     return {
         '__template__': 'blogs.html',
@@ -137,12 +137,11 @@ def api_register_user(*, email, name, password):
     if not password or not _RE_SHA1.match(password):
         raise APIValueError('_RE_SHA1')
     users = yield from User.findAll('email=?',  [email])
-    logging.info('register_user now is ok.')
     if len(users) > 0:
         raise APIError('register:failed', 'email', 'Email is already in use.')
     uid = next_id()
     sha1_password = '%s:%s' % (uid, password)
-    user = User(id = uid, name = name.strip(), email = email,
+    user = User(user_id = uid, name = name.strip(), email = email,
      password = hashlib.sha1(sha1_password.encode('utf-8')).hexdigest(),
      image = 'http://www.gravatar.com/avatar/%s?d=mm&s=120' % hashlib.md5(email.encode('utf-8')).hexdigest())
     yield from user.save()
@@ -169,8 +168,7 @@ def signout(request):
     return r
 
 @post('/api/authenticate')
-def authenticate(*, email, passwd):
-    password = passwd
+def authenticate(*, email, password):
     logging.info('In authenticate.')
     if not email:
         raise APIValueError('email', 'Invalid email.')
@@ -179,10 +177,10 @@ def authenticate(*, email, passwd):
     users = yield from User.findAll('email=?', [email])
     if len(users) == 0:
         raise APIValueError('email', 'Email not existt.')
-    user = user[0]
+    user = users[0]
 
     sha1 = hashlib.sha1()
-    sha1.update(user.id.encode('utf-8'))
+    sha1.update(user.user_id.encode('utf-8'))
     sha1.update(b':')
     sha1.update(password.encode('utf-8'))
     if user.password != sha1.hexdigest():
