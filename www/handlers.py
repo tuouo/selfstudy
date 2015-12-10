@@ -161,7 +161,7 @@ def signin():
 
 @get('/signout')
 def signout(request):
-    referer = request.header.get('Referer')
+    referer = request.headers.get('Referer')
     r = web.HTTPFound(referer or '/')
     r.set_cookie(COOKIE_NAME, '-deleted-', max_age = 0, httponly = True)
     logging.info('user signed out.')
@@ -190,7 +190,7 @@ def authenticate(*, email, password):
     r.set_cookie(COOKIE_NAME, user2cookie(user, 86400), max_age = 86400, httponly = True)
     user.password = '******'
     r.content_type = 'application/json'
-    r.body = json.dump(user, ensure_ascii = False).encode('utf-8')
+    r.body = json.dumps(user, ensure_ascii = False).encode('utf-8')
     return r
 
 
