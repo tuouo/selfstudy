@@ -42,10 +42,6 @@ def text2html(text):
     lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'), filter(lambda s: s.strip() != '', text.split('\n')))
     return ''.join(lines)
 
-def text2html(text):
-    lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'), filter(lambda s: s.strip() != '', text.split('\n')))
-    return ''.join(lines)
-
 @asyncio.coroutine
 def cookie2user(cookie_str):
     '''
@@ -118,6 +114,46 @@ def api_get_user(*, page = '1'):
     #return dict(page = p, users = users)
     return dict(user = users)
 
+@get('/api/users')
+def api_get_user(*, page = '1'):
+    page_index = get_page_index(page)
+    num = yield from User.findNumber('count(id)')
+    p = Page(num, page_index)
+    if num == 0:
+       return dict(page = p, users=())
+    users = yield from User.findAll(orderBy = 'created_at desc')#, limit = (p.offset, p.limit)
+    for u in users:
+        u.password = '******'
+    return dict(page = p, users = users)
+
+@get('/real')
+def indexReal(*, page = '1'):
+    page_index = get_page_index(page)
+    num = yield from Blog.findNumber('count(id)')
+    page = Page(num)
+    if num == 0:
+        blogs = []
+    else:
+        blogs = yield from Blog.findAll(orderBy = 'created_at dsec', limit = (page.offset, page.limit))
+    return {
+        '__template__': 'blogs.html',
+        'page': page,
+        'blogs': blogs
+    }
+
+@get('/blog/{blog_id}')
+def get_blog(blog_id):
+    blog = yield from Blog.find(blog_id)
+    comments = yield from Blog.findAll('blog_id = ?', [blog_id], orderBy = 'created_at desc')    
+    for c in comments:
+        c.html_content = text2html(c.content)
+    blog.html_content = markdown2.markdown(blog.content)
+    return {
+        '__template__': 'blogs.html',
+        'blog': blog,        
+        'comments': comments
+    }
+
 @get('/register')
 def register():
     return {
@@ -126,7 +162,6 @@ def register():
 
 _RE_EMAIL = re.compile(r'^[a-z0-9\.\-_]+\@[a-z0-9\-_]+(\.[a-z0-9\-\_]+){1,4}$')
 _RE_SHA1 = re.compile(r'^[0-9a-f]{40}$')
-
 @post('/api/users')
 def api_register_user(*, email, name, password):
     logging.info('---------------in api_register_user.')
@@ -194,6 +229,95 @@ def authenticate(*, email, password):
     return r
 
 
+@get('/manage/')
+def manage():
+    return 'redirect:/manage/comments'
+
+@get('/manage/comments')
+def manage_comments(*, page = '1'):
+    return {
+        '__template__': 'manage_comments.html'
+        'page_index': get_page_index(page)
+    }
+
+@get('/manage/blogs')
+def manage_blogs(*, page = '1'):
+    return {
+        '__template__': 'manage_blogs.html'
+        'page_index': get_page_index(page)
+    }
+
+@get('/manage/blogs/create')
+def manage_create_blog():
+    return {
+        '__template__': 'manage_blog_edit.html'
+        'blog_id': '',
+        'action': '/api/blogs'
+    }
+
+@get('/manage/blogs/edit')
+def manage_edit_blog(*, blog_id):
+    return {
+        '__template__': 'manage_blog_edit.html'
+        'blog_id': blog_id,
+        'action': '/api/blogs/%s' % blog_id
+    }
+
+@get('/manage/users')
+def manage_users(*, page = '1'):
+    return {
+        '__template__': 'manage_users.html'
+        'page_index': get_page_index(page)
+    }
+
+@get('/api/comments')
+def api_comments(*, page = '1'):
+    page_index = get_page_index(page)
+    num = yield from Comment.findNumber('count(id)')
+    p = Page(num, page_index)
+    if num == 0:
+        return dict(age = p, comments = ())
+    comments = yield from Comment.findAll(orderBy = 'created_at desc', limit = (p.offset, p.limit))
+    return dict(page = p, comments = comments)
+
+@post('/api/blogs/{comment_id}/comments')
+def api_create_comment(comment_id, request, *, content):
+    user = request.__user__
+    if user is None:
+        raise APIPermissionError("Signin, Please.")
+    if not content or not content.strip():
+        raise APIValueError("No content.")
+    blog = yield from Blog.find(comment_id)
+    if blog is None:
+        raise APIResourceNotFoundError("Blog")
+    comment = Comment(blog_id = blog.blog_id, user_id = user.user_id, user_name = name, user_image = user.image, content = content.strip())
+    yield from comment.save()
+    return comment
+
+@post('/api/comments/{id}/delete')
+def api_delete_comments(comment_id, request):
+    check_admin(request)
+    c = yield from Comment.find(comment_id)
+    if c is None:
+        raise APIResourceNotFoundError('Comment')
+    yield from c.remove()
+    return dict(comment_id = comment_id)
+
+@get('/api/blogs')
+def api_blogs(*, page = '1'):
+    page_index = get_page_index(page)
+    num = yield from Blog.findNumber('count(id)')
+    p = Page(num, page_index)
+    if num == 0:
+       return dict(page = p, blogs = ())
+    blogs = yield from Blog.findAll(orderBy = 'created_at desc', limit = (p.offset, p.limit))
+    return dict(page = p, blogs = blogs)
+
+@get('/api/blogs/{blog_id}')
+def api_get_blog(*, blog_id):
+    blog = yield from Blog.find(blog_id)
+    return blog
+
 @post('/api/blogs')
 def api_create_blog(request, *, name, summary, content):
     check_admin(request)
@@ -207,4 +331,25 @@ def api_create_blog(request, *, name, summary, content):
     yield from blog.save()
     return blog
 
+@post('/api/blogs/{blog_id}')
+def api_update_blog(blog_id, request, *, name, summary, content):
+    check_admin(request)
+    blog = yield from Blog.find(blog_id)
+    if not name or not name.strip():
+        raise APIValueError('name', 'name cannot be empty.')
+    if not summary or not summary.strip():
+        raise APIValueError('summary', 'summary cannot be empty.')
+    if not content or not content.strip():
+        raise APIValueError('content', 'content cannot be empty.')
+    blog.name = name.strip()
+    blog.summary = summary.strip()
+    blog.content = content.strip()
+    yield from blog.update()
+    return blog
 
+@post('/api/blogs/{blog_id)/delete')
+def api_delete_blog(request, *, blog_id):
+    check_admin(request)
+    blog = yield from Blog.find(blog_id)
+    yield from blog.remove()
+    return dict(blog_id = blog_id)
