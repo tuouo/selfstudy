@@ -1,4 +1,4 @@
-#!/usr/bin/envpython3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os, sys, time, subprocess
 from watchdog.observers import Observer
@@ -33,8 +33,8 @@ def kill_process():
 
 def start_process():
     global process, command
-    log("********start process %s ********" % ' '.join(command))
-    process = subprocess.Popen(command, stdin = sys.stdin, stdout = sys.stdout, stderr = sys.stderr)
+    log("*** start process %s ***" % ' '.join(command))
+    process = subprocess.Popen(command, stdin = sys.stdin, stdout = sys.stdout, stderr = sys.stderr, shell = True)
 
 def restart_process():
     kill_process()
@@ -45,7 +45,7 @@ def watch(path, callback):
     observer = Observer()
     observer.schedule(MyFileSystemEventHander(restart_process), path, recursive = True)
     observer.start()
-    log("********watching directory %s ********" % path)
+    log("*** watching directory %s ***" % path)
     start_process()
     try:
         while True:
@@ -55,12 +55,10 @@ def watch(path, callback):
     observer.join()
 
 
-if __main__ == '__main__':
+if __name__ == '__main__':
     argv = sys.argv[1:]
     if not argv:
         print("exit.")
         exit(0)
-    if argv[0] != 'python3':
-        argv.insert(0, 'python3')
     command = argv
-    watch(os,path.abspath('.'), None)
+    watch(os.path.abspath('.'), None)
