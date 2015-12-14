@@ -4,25 +4,40 @@
 
 {% block content %}
 
+
+    <div class="uk-width-medium-1-4">
+        <div class="uk-panel uk-panel-header">
+            <h3 class="uk-panel-title">精选</h3>
+            <ul class="uk-list">
+                <li><a target="_blank" href="">文章1</a></li>
+                <li><a target="_blank" href="">文章2</a></li>
+                <li><a target="_blank" href="">文章3</a></li>
+                <li><a target="_blank" href="">文章4</a></li>
+            </ul>
+        </div>
+        <div class="uk-panel uk-panel-header">
+            <h3 class="uk-panel-title">标签</h3>
+            <ul class="uk-list">
+                <li><a target="_blank" href="">标签1</a></li>
+                <li><a target="_blank" href="">标签2</a></li>
+                <li><a target="_blank" href="">标签3</a></li>
+                <li><a target="_blank" href="">标签4</a></li>
+                <li><a>&nbsp</a><li/>
+            </ul>
+        </div>
+    </div>
+
     <div class="uk-width-medium-3-4">
     {% for blog in blogs %}
         <article class="uk-article">
-            <h2><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h2>
+            <h2><a href="/blog/{{ blog.blog_id }}">{{ blog.name }}</a></h2>
             <p class="uk-article-meta">发表于{{ blog.created_at|datetime }}</p>
             <p>{{ blog.summary }}</p>
-            <p><a href="/blog/{{ blog.id }}">全文 ———— 继续阅读>><i class="uk-icon-angle-double-right"></i></a></p>
+            <p><a href="/blog/{{ blog.blog_id }}">全文 ———— 继续阅读>><i class="uk-icon-angle-double-right"></i></a></p>
         </article>
         <hr class="uk-article-divider">
     {% endfor %}
     </div>
 
-    <div class="uk-width-medium-1-4">
-        <div class="uk-panel uk-panel-header">
-            <h3 class="uk-panel-title">友情链接</h3>
-            <ul class="uk-list uk-list-line">
-                <li><i class="uk-icon-thumbs-o-up"></i> <a target="_blank" href="www.liaoxuefeng.com">廖雪峰官方网站</a></li>
-            </ul>
-        </div>
-    </div>
 
 {% endblock %}
