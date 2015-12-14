@@ -236,21 +236,21 @@ def manage():
 @get('/manage/comments')
 def manage_comments(*, page = '1'):
     return {
-        '__template__': 'manage_comments.html'
+        '__template__': 'manage_comments.html',
         'page_index': get_page_index(page)
     }
 
 @get('/manage/blogs')
 def manage_blogs(*, page = '1'):
     return {
-        '__template__': 'manage_blogs.html'
+        '__template__': 'manage_blogs.html',
         'page_index': get_page_index(page)
     }
 
 @get('/manage/blogs/create')
 def manage_create_blog():
     return {
-        '__template__': 'manage_blog_edit.html'
+        '__template__': 'manage_blog_edit.html',
         'blog_id': '',
         'action': '/api/blogs'
     }
@@ -258,7 +258,7 @@ def manage_create_blog():
 @get('/manage/blogs/edit')
 def manage_edit_blog(*, blog_id):
     return {
-        '__template__': 'manage_blog_edit.html'
+        '__template__': 'manage_blog_edit.html',
         'blog_id': blog_id,
         'action': '/api/blogs/%s' % blog_id
     }
@@ -266,7 +266,7 @@ def manage_edit_blog(*, blog_id):
 @get('/manage/users')
 def manage_users(*, page = '1'):
     return {
-        '__template__': 'manage_users.html'
+        '__template__': 'manage_users.html',
         'page_index': get_page_index(page)
     }
 
@@ -347,7 +347,7 @@ def api_update_blog(blog_id, request, *, name, summary, content):
     yield from blog.update()
     return blog
 
-@post('/api/blogs/{blog_id)/delete')
+@post('/api/blogs/{blog_id}/delete')
 def api_delete_blog(request, *, blog_id):
     check_admin(request)
     blog = yield from Blog.find(blog_id)
