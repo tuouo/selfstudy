@@ -103,25 +103,19 @@ def index(request):
 
 @get('/api/all')
 def api_get_user(*, page = '1'):
-    #page_index = get_page_index(page)
-    #num = yield from User.findNumber('count(id)')
-    #p = Page(num, page_index)
-    #if num == 0:
-    #    return dict(page = p, users=())
-    users = yield from User.findAll(orderBy = 'created_at desc')#, limit = (p.offset, p.limit)
+    users = yield from User.findAll(orderBy = 'created_at desc')
     for u in users:
         u.password = '******'
-    #return dict(page = p, users = users)
     return dict(user = users)
 
 @get('/api/users')
-def api_get_user(*, page = '1'):
+def api_get_users(*, page = '1'):
     page_index = get_page_index(page)
-    num = yield from User.findNumber('count(id)')
+    num = yield from User.findNumber('count(user_id)')
     p = Page(num, page_index)
     if num == 0:
        return dict(page = p, users=())
-    users = yield from User.findAll(orderBy = 'created_at desc')#, limit = (p.offset, p.limit)
+    users = yield from User.findAll(orderBy = 'created_at desc', limit = (p.offset, p.limit))
     for u in users:
         u.password = '******'
     return dict(page = p, users = users)
@@ -129,7 +123,7 @@ def api_get_user(*, page = '1'):
 @get('/real')
 def indexReal(*, page = '1'):
     page_index = get_page_index(page)
-    num = yield from Blog.findNumber('count(id)')
+    num = yield from Blog.findNumber('count(blog_id)')
     page = Page(num)
     if num == 0:
         blogs = []
@@ -273,7 +267,7 @@ def manage_users(*, page = '1'):
 @get('/api/comments')
 def api_comments(*, page = '1'):
     page_index = get_page_index(page)
-    num = yield from Comment.findNumber('count(id)')
+    num = yield from Comment.findNumber('count(comment_id)')
     p = Page(num, page_index)
     if num == 0:
         return dict(age = p, comments = ())
@@ -294,7 +288,7 @@ def api_create_comment(comment_id, request, *, content):
     yield from comment.save()
     return comment
 
-@post('/api/comments/{id}/delete')
+@post('/api/comments/{comment_id}/delete')
 def api_delete_comments(comment_id, request):
     check_admin(request)
     c = yield from Comment.find(comment_id)
@@ -306,7 +300,7 @@ def api_delete_comments(comment_id, request):
 @get('/api/blogs')
 def api_blogs(*, page = '1'):
     page_index = get_page_index(page)
-    num = yield from Blog.findNumber('count(id)')
+    num = yield from Blog.findNumber('count(blog_id)')
     p = Page(num, page_index)
     if num == 0:
        return dict(page = p, blogs = ())
