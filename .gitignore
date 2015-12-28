@@ -7,3 +7,6 @@ resource
 
 # Cache
 __pycache__
+
+# test
+forMore/test.log
