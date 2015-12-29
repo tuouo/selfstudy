@@ -36,11 +36,11 @@ print(np.loadtxt("a.txt", delimiter = ","))
 a = np.arange(8)
 b = np.add.accumulate(a)
 c = a + b
-with open("result.py", "wb") as f:
+with open("result.npy", "wb") as f:
     np.save(f, a)
     np.save(f, b)
     np.save(f, c)
-with open("result.py", "rb") as f:
+with open("result.npy", "rb") as f:
     print(np.load(f))
     print(np.load(f))
     print(np.load(f))
