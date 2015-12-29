@@ -17,3 +17,30 @@ b = np.fromfile("a.bin", dtype = np.int32)
 print(b)
 b.shape = (3,4)
 print(b)
+
+a = np.array([[1,2,3], [4,5,6]])
+b = np.arange(0, 1.0, 0.1)
+c = np.sin(b)
+np.savez("result.npz", a, b, sin_array = c)
+r = np.load("result.npz")
+print(r["arr_0"])
+print(r["arr_1"])
+print(r["sin_array"])
+
+a = np.arange(0, 12, 0.5).reshape(4, -1)
+np.savetxt("a.txt", a)
+print(np.loadtxt("a.txt"))
+np.savetxt("a.txt", a, fmt = "%d", delimiter = ",")
+print(np.loadtxt("a.txt", delimiter = ","))
+
+a = np.arange(8)
+b = np.add.accumulate(a)
+c = a + b
+with open("result.py", "wb") as f:
+    np.save(f, a)
+    np.save(f, b)
+    np.save(f, c)
+with open("result.py", "rb") as f:
+    print(np.load(f))
+    print(np.load(f))
+    print(np.load(f))
