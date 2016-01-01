@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- cofing: utf-8 -*-
+# -*- coding: utf-8 -*-
 from html.parser import HTMLParser
 import urllib.request as ur, urllib.error as ue, re
 class qiubaiParser(HTMLParser):
