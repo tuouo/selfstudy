@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- cofing: utf-8 -*-
+# -*- coding: utf-8 -*-
+from datetime import datetime, date, time
 from html.parser import HTMLParser
 import urllib.request as ur, urllib.error as ue, re, os
 class allPageParser(HTMLParser):
@@ -16,33 +17,36 @@ class allPageParser(HTMLParser):
                     self._mess.append(i[1])
         elif ('class', 'threadlist_reply_date j_reply_data') in attrs:
             self._tag = "lastResponse"
+        elif ('class', 'clear') in attrs:
+            self._info.append(self._mess)
+            self._mess = []
 
     def handle_data(self, data):
         if self._tag == "lastResponse":
             self._tag = ""
-            self._mess.append(data.strip())
-            self._info.append(self._mess)
-            self._mess = []
+            data = data.strip()
+            if data != "":
+                if ":" in data:
+                    times = time(int(data.split(":")[0]), int(data.split(":")[1]))
+                    self._mess.append(datetime.combine(date.today(), times).__str__())
+                elif "-" in data:
+                    self._mess.append(data)
 
 
-if __name__ == '__main__':
-    path = os.path.join(os.getcwd(), "resource", "zangnan", "posts.rtf")
-    url = "http://tieba.baidu.com/f?kw=%E4%BC%AA%E9%98%BF%E9%B2%81%E7%BA%B3%E6%81%B0%E5%B0%94%E9%82%A6&ie=utf-8&tp=0&pn="
-    pageEnd = 129 - 1
-    pageBegin = 0
-
-    for page in range(pageEnd, pageBegin, -1):
+def getAllPages(path, url, pageBegin, pageEnd):
+    dirs = 1 if pageEnd > pageBegin else -1
+    for page in range(pageBegin, pageEnd, dirs):
         try:
             pageChange = str((page) * 50)
             req = ur.Request(url + pageChange)
             response = ur.urlopen(req)
-            data = response.read().decode('utf-8')
+            data = response.read().decode('utf-8', 'ignore')
             parser = allPageParser()
             parser.feed(data)
             print("get page %s ok." % (page + 1))
             with open(path, "a") as info:
                 # print(type(info))
-                for i in parser._info[::-1]:
+                for i in parser._info[::dirs]:
                     info.write(str(i) + "\n")     
         except ue.URLError as e:
             if hasattr(e, "code"):
@@ -50,3 +54,14 @@ if __name__ == '__main__':
             if hasattr(e, "reason"):
                 print(e.reason)
     print("write ok.")
+
+if __name__ == '__main__':
+    url = "http://tieba.baidu.com/f?kw=%E4%BC%AA%E9%98%BF%E9%B2%81%E7%BA%B3%E6%81%B0%E5%B0%94%E9%82%A6&ie=utf-8&tp=0&pn="
+    # path = os.path.join(os.getcwd(), "resource", "zangnan", "posts.rtf")
+    # pageBegin = 129 - 1
+    # pageEnd = 0
+    # getAllPages(path, url, pageBegin, pageEnd)
+    path = os.path.join(os.getcwd(), "resource", "zangnan", "new.rtf")
+    pageBegin = 0
+    pageEnd = 2
+    getAllPages(path, url, pageBegin, pageEnd)
