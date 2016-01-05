@@ -9,6 +9,13 @@ with open (artf, 'w') as f:
         f.write("Hello, this is line %s.\n" % i)
         print(len("Hello, this is line %s.\n" % i), f.tell())        
         # why f.tell() = len(context) + 1 in first line and similar in after 
+        # ? \r\n ?  maybe
+
+
+with open (artf, 'rb') as f:
+    for i in f:
+        print(i)
+
 
 with open (artf, 'r') as f:
     print(f)
@@ -28,7 +35,7 @@ with open (artf, 'r') as f:
     print(f.read(26), "----22")
     f.seek(23)
     print(f.read(25), "----23")    # why start same as f.seek(22)
-    f.seek(24)
+    f.seek(24)                     # ? \r\n ?  maybe
     print(f.read(24), "----24")
 
 with open (artf, 'a') as f:
