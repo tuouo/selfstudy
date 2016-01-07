@@ -32,7 +32,6 @@ class allPageParser(HTMLParser):
                 elif "-" in data:
                     self._mess.append(data)
 
-
 def getAllPages(path, url, pageBegin, pageEnd):
     dirs = 1 if pageEnd > pageBegin else -1
     for page in range(pageBegin, pageEnd, dirs):
@@ -40,13 +39,13 @@ def getAllPages(path, url, pageBegin, pageEnd):
             pageChange = str((page) * 50)
             req = ur.Request(url + pageChange)
             response = ur.urlopen(req)
-            data = response.read().decode('utf-8', 'ignore')
+            data = response.read().decode('utf-8')#, 'ignore')
             parser = allPageParser()
             parser.feed(data)
             print("get page %s ok." % (page + 1))
             with open(path, "a") as info:
                 # print(type(info))
-                for i in parser._info[::dirs]:
+                for i in parser._info[::dirs]:                    
                     info.write(str(i) + "\n")     
         except ue.URLError as e:
             if hasattr(e, "code"):
@@ -55,13 +54,10 @@ def getAllPages(path, url, pageBegin, pageEnd):
                 print(e.reason)
     print("write ok.")
 
+
 if __name__ == '__main__':
     url = "http://tieba.baidu.com/f?kw=%E4%BC%AA%E9%98%BF%E9%B2%81%E7%BA%B3%E6%81%B0%E5%B0%94%E9%82%A6&ie=utf-8&tp=0&pn="
-    # path = os.path.join(os.getcwd(), "resource", "zangnan", "posts.rtf")
-    # pageBegin = 129 - 1
-    # pageEnd = 0
-    # getAllPages(path, url, pageBegin, pageEnd)
-    path = os.path.join(os.getcwd(), "resource", "zangnan", "new.rtf")
-    pageBegin = 0
-    pageEnd = 2
+    path = os.path.join(os.getcwd(), "resource", "zangnan", "posts.rtf")
+    pageBegin = 129 - 1
+    pageEnd = 0
     getAllPages(path, url, pageBegin, pageEnd)
