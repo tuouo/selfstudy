@@ -10,3 +10,5 @@ __pycache__
 # test
 test.py
 est2.py
+fileWriteTest.py
+mmapTest.py
