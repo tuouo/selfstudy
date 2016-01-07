@@ -10,6 +10,7 @@ __pycache__
 
 # test
 test.py
+forTieba/test.py
 forTieba/est2.py
 forTieba/fileWriteTest.py
 forTieba/mmapTest.py
