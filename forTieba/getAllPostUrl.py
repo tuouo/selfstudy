@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, date, time
 from html.parser import HTMLParser
-import urllib.request as ur, urllib.error as ue, re, os
+import urllib.request as ur, urllib.error as ue, re, os, html
 class allPageParser(HTMLParser):
     def __init__(self):
         super(allPageParser, self).__init__()
@@ -33,20 +33,22 @@ class allPageParser(HTMLParser):
                     self._mess.append(data)
 
 def getAllPages(path, url, pageBegin, pageEnd):
+    count = 0
     dirs = 1 if pageEnd > pageBegin else -1
     for page in range(pageBegin, pageEnd, dirs):
         try:
             pageChange = str((page) * 50)
             req = ur.Request(url + pageChange)
             response = ur.urlopen(req)
-            data = response.read().decode('utf-8')#, 'ignore')
+            data = response.read().decode('utf-8', 'ignore')
             parser = allPageParser()
             parser.feed(data)
-            print("get page %s ok." % (page + 1))
-            with open(path, "a") as info:
-                # print(type(info))
-                for i in parser._info[::dirs]:                    
-                    info.write(str(i) + "\n")     
+            count += len(parser._info)
+            with open(path, "a+b") as info:
+                for i in parser._info[::dirs]:
+                    info.write(str(i).encode('utf-8') + b"\r\n") 
+            print("get page %s ok.  All: %s" % (page + 1, count))
+   
         except ue.URLError as e:
             if hasattr(e, "code"):
                 print(e.code)
@@ -59,5 +61,5 @@ if __name__ == '__main__':
     url = "http://tieba.baidu.com/f?kw=%E4%BC%AA%E9%98%BF%E9%B2%81%E7%BA%B3%E6%81%B0%E5%B0%94%E9%82%A6&ie=utf-8&tp=0&pn="
     path = os.path.join(os.getcwd(), "resource", "zangnan", "posts.rtf")
     pageBegin = 129 - 1
-    pageEnd = 0
+    pageEnd = 0 - 1
     getAllPages(path, url, pageBegin, pageEnd)
