@@ -27,7 +27,7 @@ class allPageParser(HTMLParser):
                 self._mess = []
 
     def handle_data(self, data):
-    	if self._goOn:
+        if self._goOn:
             if self._tag == "lastResponse":
                 self._tag = ""
                 data = data.strip()
@@ -41,7 +41,17 @@ class allPageParser(HTMLParser):
                         if self._goOn:
                             self._mess.append(day.__str__())
                     elif "-" in data:
-                        self._mess.append(data)
+                        if self._day:
+                            today = datetime.today()
+                            dt = datetime(today.year, int(data.split("-")[0]), int(data.split("-")[1]))
+                            if today < dt:
+                                dt = dt.replace(year = today.year - 1)
+                            if self._day < dt:
+                                self._goOn = False
+                        if self._goOn:
+                            self._mess.append(data)
+
+                        
 
 def getAllPages(path, url, pageBegin, pageEnd, day):
     dirs = 1 if pageEnd > pageBegin else -1
