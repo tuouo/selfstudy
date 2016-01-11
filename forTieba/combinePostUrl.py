@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os, mmap
 from datetime import datetime, date, time
-from getItemData import getDateTime, getLastLine, reverse, path
+from getItemData import getDateTime, reverse, path
 
 fill = b"+"
 
@@ -61,6 +61,6 @@ def combineUrls(old, new):
             allF.write(data2)
 
 if __name__ == '__main__':
-    allfile = os.path.join(path, "old2.rtf")
+    allfile = os.path.join(path, "posts.rtf")
     newfile = os.path.join(path, "new.rtf")
     combineUrls(allfile, newfile)
