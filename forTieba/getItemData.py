@@ -39,9 +39,9 @@ def reverse(old, new):
     oldfile = os.path.join(path, old)
     newfile = os.path.join(path, new)
     data = []
-    with open(oldfile, "r+") as old:
+    with open(oldfile, "r+b") as old:
         for i in old:
             data.append(i)
-    with open(newfile, "w+") as new:
+    with open(newfile, "w+b") as new:
         for i in data[::-1]:
             new.write(i)
