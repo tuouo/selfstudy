@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from html.parser import HTMLParser
 from PIL import Image
-import urllib.request as ur, urllib.error as ue, os, re, string
+import urllib.request as ur, urllib.error as ue, os, re, string, time
 alphablet = string.ascii_lowercase
 
 class urlPostParser(HTMLParser):
@@ -20,7 +20,7 @@ class urlPostParser(HTMLParser):
                         imgName = self._Item["post_no"] + alphablet[self._count] + ".png"
                         mgUrl, self._count = i[1], self._count + 1
                         self._img[imgName] = mgUrl
-                        data = "IMAGE" + imgName + "IMAGE"
+                        data = "IMAGE%s %s IMAGE" % (imgName, mgUrl)
                         self._info += data
             elif tag == "br":
                 self._info += "\r\n"
@@ -47,7 +47,7 @@ class urlPostParser(HTMLParser):
 
 def getFloorInfo(allInfo):
     one   = {}
-    name  = re.findall("name_u:(\S.+)&", allInfo)[0].replace("%", r"\x")
+    name  = re.findall("name_u:(\S+)&", allInfo)[0].replace("%", r"\x")
     one["name_u"]      = name.encode('latin1').decode('unicode_escape').encode('latin1').decode('utf-8')
     one["post_no"]     = re.findall("post_no:(\d+),", allInfo)[0]
     one["date"]        = re.findall("date:(.{16}),", allInfo)[0]
@@ -58,24 +58,55 @@ def getFloorInfo(allInfo):
 def getFloorStr(one):
     return "%s, %s, %s, %s, %s" % (one["post_no"], one["name_u"], one["date"], one["post_id"], one["comment_num"])
 
-def getOnePost(url, path):           
-    response = ur.urlopen(url)
-    data = response.read().decode('utf-8', 'ignore')
-    parser = urlPostParser()
-    parser.feed(data)
-    with open(os.path.join(path, "text.rtf"), "wb") as testfile:
-        for i in parser._all:
-            for j in i:
-                testfile.write(j.encode('utf-8') + b"\r\n")
-            testfile.write(b"\r\n")
-    # if parser._img:
-    #     for name, url in parser._img.items():
-    #         with open(os.path.join(path, name), "wb") as img:
-    #             img.write(ur.urlopen(url).read())
+def getComment(url, post_id):
+    localTime = str(int(time.time()))
+    commentUrl = "http://tieba.baidu.com/p/totalComment?t="
+    commentURL = "%s%s&tid=%s&fid=%s&pn=1&see_lz=0" % (commentUrl, localTime, url.split('/')[-1], post_id)
+    req = ur.urlopen(commentURL)
+    data = req.read().replace(b'"', b'').decode("unicode_escape")
+    return getIDContext(data)
+
+def getIDContext(data):
+    post_id    = re.findall("post_id:(\d+),comment_id", data)
+    comment_id = re.findall("comment_id:(\d+),username", data)
+    username   = re.findall("username:(\S+?),user_id", data)    # need "?""
+    content    = re.findall("content:(.+?),ptype", data)
+    return [post_id, comment_id, username, content]
+
+def getOnePost(url, path):      
+    url += "?pn="
+    page, dataPre= 1, ""
+    while 1:    # need find haw many page
+        response = ur.urlopen(url + str(page))
+        data = response.read().decode('utf-8', 'ignore')
+        parser = urlPostParser()
+        parser.feed(data)
+        if parser._all:
+            one_post_id = parser._all[0][0].split(", ")[3]
+            comment = getComment(url, one_post_id)
+            with open(os.path.join(path, "text.rtf"), "ab") as testfile:
+                for i in parser._all:
+                    one_post_id = i[0].split(", ")[3]
+                    for j in i:
+                        testfile.write(j.encode('utf-8') + b"\r\n")     # reply
+                    num, maxNum = 0, len(comment[0])
+                    while num < maxNum and one_post_id == comment[0][num]:
+                        context = comment[3][num].replace(r"<\/a>", "").replace(r"\/", r"/")
+                        for i in re.findall("(<a.+>)", context):        # remove href for name
+                            context = context.replace(i, "")             
+                        data = "*%s*%s:%s" % (comment[1][num], comment[2][num], context)
+                        testfile.write(data.encode('utf-8') + b"\r\n")  # comment
+                        num += 1
+                    testfile.write(b"\r\n")  
+        if parser._img:
+            for name, url in parser._img.items():
+                with open(os.path.join(path, name), "wb") as img:
+                    img.write(ur.urlopen(url).read())
+        page += 1
 
 
 if __name__ == '__main__':
-    # url = "http://tieba.baidu.com/p/4147438587"
+    # url = "http://tieba.baidu.com/p/4147438587" #in this post, last page has nothing
     url = "http://tieba.baidu.com/p/3586361872"
     fileName = re.findall("/(\d+)", url)[0]
     path = os.path.join(os.getcwd(), "resource", "zangnan")
