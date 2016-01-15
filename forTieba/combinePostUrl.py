@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os, mmap
 from datetime import datetime, date, time
-from getItemData import getDateTime, reverse, path
+from getItemData import getDateTime, reverse
 
 fill = b"+"
 
@@ -53,14 +53,16 @@ def combineUrls(old, new):
     deleteOldItem(old, new)
     end = gatherItem(old, new)
     reverse(new, new)
-    with open(allfile, "r+b") as allF:
+    with open(old, "r+b") as allF:
         data = allF.read()
         allF.seek(end)
-        with open(newfile, "r+b") as newF:
+        with open(new, "r+b") as newF:
             data2 = newF.read()
             allF.write(data2)
+    os.remove(new)
 
 if __name__ == '__main__':
+    path = os.path.join(os.getcwd(), "resource", "zangnan")
     allfile = os.path.join(path, "posts.rtf")
     newfile = os.path.join(path, "new.rtf")
     combineUrls(allfile, newfile)
