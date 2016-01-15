@@ -3,7 +3,7 @@
 import urllib.request as ur, urllib.error as ue, re, os
 from html.parser import HTMLParser
 from datetime import datetime, date, time
-from getItemData import getDateTime, getLastData, path, url
+from getItemData import getDateTime, getLastData
 
 class allPageParser(HTMLParser):
     def __init__(self, day = None):
@@ -76,17 +76,19 @@ def getAllPages(path, url, pageBegin, pageEnd, day):
                 print(e.reason)
     print("write ok.")
 
-def getALLPostUrl(fileTo, pageBegin, pageEnd = -1):
-    fileTo = os.path.join(path, fileTo)
+def getALLPostUrl(fileTo, url, pageBegin, pageEnd = -1):
     getAllPages(fileTo, url, pageBegin, pageEnd, None)
     
-def getNewPostUrl(fileFro, fileTo, pageEnd = 100):
-    fileTo = os.path.join(path, fileTo)
-    day = getDateTime(getLastData(fileFro))
-    getAllPages(fileTo, url, 0, pageEnd, day)
+def getNewPostUrl(fileOld, fileNew, url, pageEnd = 100):
+    day = getDateTime(getLastData(fileOld))
+    getAllPages(fileNew, url, 0, pageEnd, day)
     
 
 if __name__ == '__main__':
-    # getALLPostUrl("posts.rtf", 130 -1, 127)
-
-    getNewPostUrl("posts.rtf", "new.rtf")
+    path = os.path.join(os.getcwd(), "resource", "zangnan")
+    url = "http://tieba.baidu.com/f?kw=%E4%BC%AA%E9%98%BF%E9%B2%81%E7%BA%B3%E6%81%B0%E5%B0%94%E9%82%A6&ie=utf-8&tp=0&pn="
+    # fileTo = os.path.join(path, "posts.rtf")
+    # getALLPostUrl(fileTo, url, 130 -1, 127)
+    fileOld = os.path.join(path, "posts.rtf")
+    fileNew = os.path.join(path, "new.rtf")
+    getNewPostUrl(fileOld, fileNew)
