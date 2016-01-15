@@ -1,109 +1,64 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from html.parser import HTMLParser
 from PIL import Image
-import urllib.request as ur, urllib.error as ue, os, re, string, time
-alphablet = string.ascii_lowercase
+from urlParser import urlPostParser, pageNumParser
+import urllib.request as ur, os, re, time
 
-class urlPostParser(HTMLParser):
-    def __init__(self):
-        super(urlPostParser, self).__init__()
-        self._tag, self._info, = "", ""
-        self._count, self._Item = 0, {}
-        self._img, self._mess, self._all = {}, [], []
-
-    def handle_starttag(self, tag, attrs):
-        if self._tag == "data:":
-            if tag == "img":
-                for i in attrs:
-                    if i[0] == "src":
-                        imgName = self._Item["post_no"] + alphablet[self._count] + ".png"
-                        mgUrl, self._count = i[1], self._count + 1
-                        self._img[imgName] = mgUrl
-                        data = "IMAGE%s %s IMAGE" % (imgName, mgUrl)
-                        self._info += data
-            elif tag == "br":
-                self._info += "\r\n"
-        elif (('class', 'l_post j_l_post l_post_bright  ') in attrs or
-            ('class', 'l_post j_l_post l_post_bright noborder ') in attrs):
-            for i in attrs:
-                if i[0] == "data-field":
-                    self._Item = getFloorInfo(i[1].replace('"', ''))
-                    self._mess.append(getFloorStr(self._Item))
-        elif ('class', 'd_post_content j_d_post_content  clearfix') in attrs:
-            self._tag = "data:"      
-
-    def handle_data(self, data):
-        if self._tag == "data:":
-            data = data.strip()
-            self._info += data            
-
-    def handle_endtag(self, tag):
-        if tag == "div" and self._tag == "data:":
-            self._mess.append(self._info)
-            self._all.append(self._mess)
-            self._tag, self._info = "", ""
-            self._count, self._mess = 0, []
-
-def getFloorInfo(allInfo):
-    one   = {}
-    name  = re.findall("name_u:(\S+)&", allInfo)[0].replace("%", r"\x")
-    one["name_u"]      = name.encode('latin1').decode('unicode_escape').encode('latin1').decode('utf-8')
-    one["post_no"]     = re.findall("post_no:(\d+),", allInfo)[0]
-    one["date"]        = re.findall("date:(.{16}),", allInfo)[0]
-    one["post_id"]     = re.findall("post_id:(\d+),", allInfo)[0]
-    one["comment_num"] = re.findall("comment_num:(\d+),", allInfo)[0]
-    return one
-
-def getFloorStr(one):
-    return "%s, %s, %s, %s, %s" % (one["post_no"], one["name_u"], one["date"], one["post_id"], one["comment_num"])
-
-def getComment(url, post_id):
+def getAllComment(url, post_id):
     localTime = str(int(time.time()))
     commentUrl = "http://tieba.baidu.com/p/totalComment?t="
     commentURL = "%s%s&tid=%s&fid=%s&pn=1&see_lz=0" % (commentUrl, localTime, url.split('/')[-1], post_id)
     req = ur.urlopen(commentURL)
     data = req.read().replace(b'"', b'').decode("unicode_escape")
-    return getIDContext(data)
+    return getEachComment(data)
 
-def getIDContext(data):
+def getEachComment(data):
     post_id    = re.findall("post_id:(\d+),comment_id", data)
     comment_id = re.findall("comment_id:(\d+),username", data)
     username   = re.findall("username:(\S+?),user_id", data)    # need "?""
     content    = re.findall("content:(.+?),ptype", data)
     return [post_id, comment_id, username, content]
 
+def writeContent(allContent, url, path, filename):
+    one_post_id = allContent[0][0].split(", ")[3]
+    comment = getAllComment(url, one_post_id)
+    with open(os.path.join(path, filename), "ab") as f:
+        for i in allContent:
+            one_post_id = i[0].split(", ")[3]
+            for j in i:
+                f.write(j.encode('utf-8') + b"\r\n")     # reply
+            num, maxNum = 0, len(comment[0])
+            while num < maxNum and one_post_id == comment[0][num]:
+                context = comment[3][num].replace(r"<\/a>", "").replace(r"\/", r"/")
+                for i in re.findall("(<a.+>)", context): # remove href for name
+                    context = context.replace(i, "")             
+                data = "*%s*%s:%s" % (comment[1][num], comment[2][num], context)
+                f.write(data.encode('utf-8') + b"\r\n")  # comment
+                num += 1
+            f.write(b"\r\n")
+    
 def getOnePost(url, path):      
     url += "?pn="
-    page, dataPre= 1, ""
-    while 1:    # need find haw many page
-        response = ur.urlopen(url + str(page))
-        data = response.read().decode('utf-8', 'ignore')
+    data = ur.urlopen(url + "1").read().decode('utf-8', 'ignore')
+    numParser = pageNumParser()
+    numParser.feed(data)
+    pageNum = numParser._num
+    for page in range(pageNum):    	
+        response = ur.urlopen(url + str(page + 1))
+        data = response.read()
+        data = data.decode('utf-8', 'ignore')
         parser = urlPostParser()
         parser.feed(data)
+        print("get page %s ok." % (page + 1))
         if parser._all:
-            one_post_id = parser._all[0][0].split(", ")[3]
-            comment = getComment(url, one_post_id)
-            with open(os.path.join(path, "text.rtf"), "ab") as testfile:
-                for i in parser._all:
-                    one_post_id = i[0].split(", ")[3]
-                    for j in i:
-                        testfile.write(j.encode('utf-8') + b"\r\n")     # reply
-                    num, maxNum = 0, len(comment[0])
-                    while num < maxNum and one_post_id == comment[0][num]:
-                        context = comment[3][num].replace(r"<\/a>", "").replace(r"\/", r"/")
-                        for i in re.findall("(<a.+>)", context):        # remove href for name
-                            context = context.replace(i, "")             
-                        data = "*%s*%s:%s" % (comment[1][num], comment[2][num], context)
-                        testfile.write(data.encode('utf-8') + b"\r\n")  # comment
-                        num += 1
-                    testfile.write(b"\r\n")  
+            print("write all.")
+            writeContent(parser._all, url, path, "text.rtf")
         if parser._img:
-            for name, url in parser._img.items():
-                with open(os.path.join(path, name), "wb") as img:
-                    img.write(ur.urlopen(url).read())
-        page += 1
-
+            print("write img.")
+            for name, urlIm in parser._img.items():
+            	if not os.path.exists(os.path.join(path, name)):
+                    with open(os.path.join(path, name), "wb") as img:                    
+                       img.write(ur.urlopen(urlIm).read())
 
 if __name__ == '__main__':
     # url = "http://tieba.baidu.com/p/4147438587" #in this post, last page has nothing
@@ -113,23 +68,6 @@ if __name__ == '__main__':
     filepath = os.path.join(path, fileName)
     if not os.path.exists(filepath):
         os.mkdir(filepath)
+    print("****    %s    ****" % url)
     getOnePost(url, filepath)
     print("OK, %s" % url)
-
-# path = os.path.join(os.getcwd(), "resource", "zangnan")
-# url = "http://tieba.baidu.com/"
-# newFile = os.path.join(path, "new.rtf")
-# with open(newFile, "rb") as urls:
-#     for i in urls:
-#         num = i.split(b"'")[1].decode('utf-8')
-        # print(num)
-        # url = "http://tieba.baidu.com/p/4147438587"
-        # req = ur.Request(url)
-        # # req = ur.Request(url + num)
-        # response = ur.urlopen(req)
-        # data = response.read().decode('utf-8', 'ignore')
-        # parser = urlPostParser()
-        # parser.feed(data)
-        # for i in parser._all:
-        #     print(i)
-        
