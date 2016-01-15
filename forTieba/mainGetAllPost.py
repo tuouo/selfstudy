@@ -23,6 +23,7 @@ def fromUrlItemGetPost(path, itemFile):
         getOnePost(url, filepath)
         print("OK, %s" % url)
     
+
 if __name__ == "__main__":
     if not os.path.exists(path):
         os.makedirs(path)
@@ -30,6 +31,6 @@ if __name__ == "__main__":
         getALLPostUrl(allUrlFile, url, lastPage -1)
         fromUrlItemGetPost(path, allUrlFile)
 
-    getNewPostUrl(allUrlFile, newUrlFile)
+    getNewPostUrl(allUrlFile, newUrlFile, url)
     fromUrlItemGetPost(path, newUrlFile)
     combineUrls(allUrlFile, newUrlFile)

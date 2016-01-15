@@ -56,9 +56,10 @@ def getOnePost(url, path):
         if parser._img:
             print("write img.")
             for name, urlIm in parser._img.items():
-            	if not os.path.exists(os.path.join(path, name)):
+                if not os.path.exists(os.path.join(path, name)):
                     with open(os.path.join(path, name), "wb") as img:                    
                        img.write(ur.urlopen(urlIm).read())
+
 
 if __name__ == '__main__':
     # url = "http://tieba.baidu.com/p/4147438587" #in this post, last page has nothing
