@@ -19,7 +19,7 @@ def getEachComment(data):
     content    = re.findall("content:(.+?),ptype", data)
     return [post_id, comment_id, username, content]
 
-def writeContent(allContent, url, path, filename):
+def writeContextFirstTime(allContent, url, filename):
     one_post_id = allContent[0][0].split(", ")[3]
     comment = getAllComment(url, one_post_id)
     with open(os.path.join(path, filename), "ab") as f:
@@ -36,7 +36,30 @@ def writeContent(allContent, url, path, filename):
                 f.write(data.encode('utf-8') + b"\r\n")  # comment
                 num += 1
             f.write(b"\r\n")
-    
+
+def writeContent(allContent, url, path):
+    filetext = os.path.join(path, "text.rtf")
+    if os.path.exists(filetext):
+        filecache = os.path.join(path, "cache.rtf")
+        writeContextFirstTime(allContent, url, filecache)
+        combineFile(filecache, filetext)
+    else:
+        writeContextFirstTime(allContent, url, filetext)
+
+def combineFile(filecache, filetext):
+    data, data1, data2 = [], [], []
+    with open(filecache, "r+", encoding = "utf-8") as f1:
+        data1 = f1.readlines()
+    with open(filetext, "r+", encoding = "utf-8") as f2:
+        data2 = f2.readlines()
+    result = list(difflib.ndiff(data1, data2))
+    for row in result:    
+        if row[0] != "?":
+            data.append(row[2:])
+    with open(filetext, "w+") as f:
+        for i in data:
+            f.write(i)
+
 def getOnePost(url, path):      
     url += "?pn="
     data = ur.urlopen(url + "1").read().decode('utf-8', 'ignore')
@@ -52,7 +75,7 @@ def getOnePost(url, path):
         print("get page %s ok." % (page + 1))
         if parser._all:
             print("write all.")
-            writeContent(parser._all, url, path, "text.rtf")
+            writeContent(parser._all, url, path)
         if parser._img:
             print("write img.")
             for name, urlIm in parser._img.items():
