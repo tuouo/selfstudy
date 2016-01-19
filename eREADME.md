@@ -1,2 +1,3 @@
-# git for me.
-This is one small step on Internet, one giant leap for myself.
+# git step of mine.
+
+one small step on Internet, one giant leap for myself.
