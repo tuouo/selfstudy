@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from PIL import Image
 from urlParser import urlPostParser, pageNumParser
-import urllib.request as ur, os, re, time, difflib, socket
+import urllib.request as ur, urllib.error as ue, os, re, time, difflib, socket
 
 def getAllComment(url, post_id):
     localTime = str(int(time.time()))
@@ -40,6 +40,8 @@ def writeContextFirstTime(allContent, url, filename):
 def writeContent(allContent, url, path, firstTime):
     filetext = os.path.join(path, "text.rtf")
     if firstTime:
+        if os.path.exists(filetext):
+            os.remove(filetext)
         writeContextFirstTime(allContent, url, filetext)
     else:
         filecache = os.path.join(path, "cache.rtf")
@@ -52,6 +54,8 @@ def combineFile(filecache, filetext):
         data1 = f1.readlines()
     with open(filetext, "r+", encoding = "utf-8") as f2:
         data2 = f2.readlines()
+    if data1 == data2:
+        return
     result = list(difflib.ndiff(data1, data2))
     for row in result:    
         if row[0] != "?":
@@ -64,7 +68,10 @@ def getOnePost(url, path, firstTime):
     url += "?pn="
     timeout = 20
     socket.setdefaulttimeout(timeout)
-    data = ur.urlopen(url + "1").read().decode('utf-8', 'ignore')
+    response = ur.urlopen(url + "1")
+    data = response.read()
+    response.close()
+    data = data.decode('utf-8', 'ignore')
     numParser = pageNumParser()
     numParser.feed(data)
     pageNum = numParser._num
@@ -83,9 +90,20 @@ def getOnePost(url, path, firstTime):
             print("write img.")
             for name, urlIm in parser._img.items():
                 if not os.path.exists(os.path.join(path, name)):
-                    with open(os.path.join(path, name), "wb") as img:                    
-                       img.write(ur.urlopen(urlIm).read())
-                       time.sleep(1)
+                    with open(os.path.join(path, name), "wb") as img:   
+                        try:
+                            data = ur.urlopen(urlIm).read()
+                            img.write(data)
+                            time.sleep(1)
+                        except ue.URLError as eu:
+                            # with open(os.path.join(path, "error.rtf"), "a") as feu:
+                            #     feu.write("%s, %s\n" % (name, urlIm))
+                            pass
+                        except ue.HTTPError as eh:
+                            # with open(os.path.join(path, "error.rtf"), "a") as feh:
+                            #     feh.write("%s, %s\n" % (name, urlIm))
+                            pass
+
         print("Write page %s ok." % (page + 1))
         time.sleep(1)
 
