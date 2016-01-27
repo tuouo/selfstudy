@@ -66,19 +66,19 @@ def combineFile(filecache, filetext):
 
 def getOnePost(url, path, firstTime):      
     url += "?pn="
-    timeout = 20
-    socket.setdefaulttimeout(timeout)
-    response = ur.urlopen(url + "1")
+    response = ur.urlopen(url + "1", timeout = 20)
     data = response.read()
     response.close()
+    time.sleep(1)
     data = data.decode('utf-8', 'ignore')
     numParser = pageNumParser()
     numParser.feed(data)
     pageNum = numParser._num
     for page in range(pageNum):    	
-        response = ur.urlopen(url + str(page + 1))
+        response = ur.urlopen(url + str(page + 1), timeout = 20)
         data = response.read()
         response.close()
+        time.sleep(1)
         data = data.decode('utf-8', 'ignore')
         parser = urlPostParser()
         parser.feed(data)
@@ -92,7 +92,9 @@ def getOnePost(url, path, firstTime):
                 if not os.path.exists(os.path.join(path, name)):
                     with open(os.path.join(path, name), "wb") as img:   
                         try:
-                            data = ur.urlopen(urlIm).read()
+                            response = ur.urlopen(urlIm, timeout = 20)
+                            data = response.read()
+                            response.close()
                             img.write(data)
                             time.sleep(1)
                         except ue.URLError as eu:
@@ -103,9 +105,7 @@ def getOnePost(url, path, firstTime):
                             # with open(os.path.join(path, "error.rtf"), "a") as feh:
                             #     feh.write("%s, %s\n" % (name, urlIm))
                             pass
-
         print("Write page %s ok." % (page + 1))
-        time.sleep(1)
 
 
 if __name__ == '__main__':
