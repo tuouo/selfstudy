@@ -3,7 +3,7 @@
 from getPostUrl import getALLPostUrl, getNewPostUrl
 from getEachNewUrl import getOnePost
 from combinePostUrl import combineUrls
-import os, re, socket
+import os, re, socket, time
 
 lastPage = 130
 path = os.path.join("C:/", "resource", "TiebaCrawler", "zangnan")
@@ -21,12 +21,21 @@ def fromUrlItemGetPost(path, itemFile, firstTime):
                 os.mkdir(filepath)
             url = "http://tieba.baidu.com" + url
             print("****    %s    ****" % url)
-            # firstTime = False if os.path.exists(os.path.join(path, "text.rtf")) else True            
-            try:
-                getOnePost(url, filepath, firstTime)
-            except socket.timeout:
-
-                getOnePost(url, filepath, firstTime)
+            if not firstTime:
+                firstTime = False if os.path.exists(os.path.join(path, "text.rtf")) else True
+            needAgain = True        
+            while needAgain: 
+                try:
+                    needAgain = False
+                    getOnePost(url, filepath, firstTime)
+                except socket.timeout as e:
+                    print("    socket.timeout:", e)
+                    needAgain = True
+                    time.sleep(1)
+                except Exception as e:
+                    print("    Error:", e)
+                    #  write(path, itemFile, e)
+            # getOnePost(url, filepath, firstTime)
             print("OK, %s" % url)
     
 
