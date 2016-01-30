@@ -21,4 +21,4 @@ def oneLineFileget2():
 if __name__ == '__main__':
     oneLineFileMake()
     oneLineFileget()
-    # oneLineFileget2()
+    oneLineFileget2()
