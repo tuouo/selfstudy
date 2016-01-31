@@ -7,6 +7,7 @@ Then import qrcode means import this file, not the module.
 """
 
 data = "https://github.com/tuouo/games/blob/master/nonogram/nonogram.py"
+data = "https://github.com/tuouo"
 # im = qrcode.make(data)
 # im.save("oooo.png")
 # # im.show()
@@ -19,6 +20,6 @@ qr = qrcode.QRCode(
 qr.add_data(data)
 qr.make(fit = True)
 img = qr.make_image()
-img.save("1L20.png")
+img.save("mygithub.png")
 # img.save("0L20.png")
 # # img.show()
