@@ -35,7 +35,7 @@ git config --global user.email "exampl@example.com"
 	
 14. git rm fileName.XXX
 	delete fileName.XXX
-	git commit -m "message"
+    git commit -m "message"
 	commit needed
 	
 	rm fileName.XXX
