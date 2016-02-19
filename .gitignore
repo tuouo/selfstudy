@@ -1,9 +1,0 @@
-# env
-venv
-version
-
-# Cache
-__pycache__
-
-# Test
-pre/test.py
