@@ -1,0 +1,15 @@
+mkdir flaskweb
+cd flaskweb
+install virtualenv:
+pip install virtualenv
+
+virtualenv --version
+
+virtualenv --no-site-packages venv
+    --no-site-packages means without packages which in system Python env
+venv\Scripts\activate (windows)
+source venv/bin/activate (mac)
+deactivate
+
+
+(venv) pip install flask
