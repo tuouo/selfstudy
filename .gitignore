@@ -1,0 +1,10 @@
+# env:
+venv
+version
+
+# resource
+
+# Cache
+__pycache__/
+
+# Test
