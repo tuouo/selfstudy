@@ -8,3 +8,4 @@ version
 __pycache__/
 
 # Test
+pre/test.py
