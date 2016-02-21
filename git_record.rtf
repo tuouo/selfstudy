@@ -15,3 +15,28 @@ deactivate
 (venv) pip install flask
 
 # git: file inside not visiable.Ignore
+
+######################################
+(venv) $ python
+>>> import flask
+>>> app_ctx = app.app_context()
+>>> app_ctx.push()
+>>> current_app.name
+'hello'
+>>> app_ctx.pop()
+>>> quit()
+
+(venv) $ python
+>>> from hello import app
+>>> app.url_map
+
+
+Error:
+ImportError: No moudle named flask.ext.script
+?? File "C:\Python34\lib\site-packages\flask\exthook.py", line 87??
+But I'm already in (venv)
+Then pip install flask-script for system Python env, unexpectedly£¬OK
+same issue:
+http://cocode.cc/t/flask-no-module-named-flask/3370
+http://cocode.cc/t/pycharm-from-flask-ext-script-import-manager/3469
+
