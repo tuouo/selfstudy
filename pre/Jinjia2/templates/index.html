@@ -4,4 +4,8 @@
 <div class="page-header">
 	<h1>Hello flask.</h1>
 </div>
+<p>The UTC is {{ current_time }}.</p>
+<p>The moment time is {{ moment(current_time) }}.</p>
+<p>The local date and time is {{ moment(current_time).format('L') }}.</p>
+<p>That was {{ moment(current_time).fromNow(refresh=True) }}.</p>
 {% endblock %}
