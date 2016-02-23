@@ -3,6 +3,7 @@ venv
 version
 
 # resource
+static
 
 # Cache
 __pycache__/
