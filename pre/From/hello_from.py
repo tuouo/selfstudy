@@ -4,7 +4,7 @@ from flask import Flask, render_template
 from flask.ext.script import Manager
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
-from flask.ext.wtf import From
+from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField
 from wtforms.validators import Required
 
@@ -30,6 +30,7 @@ def index():
         form.name.data = ''
     return render_template('index.html', form=form, name=name)
 
+
 @app.route('/user/<name>')
 def user(name):
     return render_template('user.html', name=name.title())
@@ -40,7 +41,7 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('500.html')
+    return render_template('500.html'), 500
 
 if __name__ == '__main__':
     manager.run()
