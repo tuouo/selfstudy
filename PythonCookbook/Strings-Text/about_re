@@ -19,7 +19,7 @@ for m in date_pat.finditer(info):
     print(m.groups(), m.group(0), m.group(1))
 
 info_new = re.sub(r'(\d+)/(\d+)/(\d+)', r'\3-\1-\2', info)
-print("{0}\n{1}\n{2}".format(info, info_new, date_pat.sub(r'\3-\1-\2', info)))
+print(info, info_new, date_pat.sub(r'\3-\1-\2', info), sep="\n")
 
 
 def change_date(m):
