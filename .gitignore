@@ -1,2 +1,52 @@
 # My configurations:
 youCannotSeeMe.txt
+=======
+# uikit:
+uikit-2.22.0.zip
+
+# test:
+test.html
+
+# source:
+images/
+
+# My tool py:
+
+# My resource
+forTieba/resource
+resource
+=======
+# My tool py:
+test.py
+fromLiaoxuefeng/hello.py
+
+# My resource
+resource
+numpy/a.bin
+numpy/a.txt
+numpy/result.npy
+numpy/result.npz
+forMore/resource
+
+
+# Cache
+__pycache__
+
+# test
+test.py
+
+forTieba/test.py
+forTieba/est2.py
+forTieba/fileWriteTest.py
+forTieba/mmapTest.py
+=======
+forMore/test.log
+
+www/unskilled.py
+www/user.py
+
+# My resource
+www/uikit
+
+# Cache
+www/__pycache__/

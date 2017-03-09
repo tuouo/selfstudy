@@ -1,0 +1,20 @@
+virtualenv: 通过提供了新的独立的Python运行环境，避免了不同应用间多版本的冲突。
+
+系统安装Python 3.4，应用程序都会共用这个运行环境，所有第三方的包都会被pip安装到Python3的site-packages目录下。
+应用需要不同的运行环境（不同版本的包），所以有了virtualenv
+pip3 install virtualenv 	pip安装virtualenv：
+对于独立的一个应用，先进入该应用的专属文件夹。再创建独立的运行环境：
+virtualenv --no-site-packages venv
+venv->为该运行环境名称。参数--no-site-packages表示不复制第三方包。
+新建的Python环境被放到当前目录下的venv目录。
+用source进入该环境：
+source venv/bin/activate
+（注意到命令提示符变了，有个(venv)前缀，表示当前环境是一个名为venv的Python环境。）
+
+此时可以安装该环境下的第三方包。系统Python环境不受任何影响。
+
+退出当前的venv环境，使用deactivate命令：
+deactivate
+
+
+
