@@ -7,10 +7,10 @@ test.html
 # source:
 images/
 
-# =======
 # My tool py:
 
 # My resource
+forTieba/resource
 resource
 
 # Cache
@@ -18,3 +18,8 @@ __pycache__
 
 # test
 test.py
+
+forTieba/test.py
+forTieba/est2.py
+forTieba/fileWriteTest.py
+forTieba/mmapTest.py
