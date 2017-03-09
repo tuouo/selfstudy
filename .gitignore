@@ -1,6 +1,6 @@
 # My configurations:
 youCannotSeeMe.txt
-=======
+
 # uikit:
 uikit-2.22.0.zip
 
@@ -10,12 +10,14 @@ test.html
 # source:
 images/
 
-# My tool py:
-
 # My resource
 forTieba/resource
+forTieba/test.py
+forTieba/est2.py
+forTieba/fileWriteTest.py
+forTieba/mmapTest.py
 resource
-=======
+
 # My tool py:
 test.py
 fromLiaoxuefeng/hello.py
@@ -26,40 +28,21 @@ numpy/a.bin
 numpy/a.txt
 numpy/result.npy
 numpy/result.npz
-forMore/resource
 
+forMore/resource
+forMore/test.log
 
 # Cache
 __pycache__
 
-# test
-test.py
-
-forTieba/test.py
-forTieba/est2.py
-forTieba/fileWriteTest.py
-forTieba/mmapTest.py
-=======
-forMore/test.log
-
 www/unskilled.py
 www/user.py
-
 # My resource
 www/uikit
 
-# Cache
-www/__pycache__/
-=======
 # env:
 venv
 version
 
 # resource
 static
-
-# Cache
-__pycache__/
-
-# Test
-pre/test.py
