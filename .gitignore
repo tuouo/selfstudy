@@ -16,3 +16,12 @@ __pycache__
 
 # test
 forMore/test.log
+
+www/unskilled.py
+www/user.py
+
+# My resource
+www/uikit
+
+# Cache
+www/__pycache__/
