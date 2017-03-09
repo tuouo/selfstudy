@@ -5,6 +5,7 @@ one small step on Internet, one giant leap for myself.
 
 # 2015 
 Things before the end of 2015
+
 # uikit
 Test uikit feature by wrote html.
 
@@ -18,14 +19,12 @@ some basic crawler.
 # PythonLearn
 Implementation of unskilled Python
 
-=======
 # learnFromBook
 
 # flaskweb
 OK, it's time for flask.
 This a webapp with flask.
 
-=======
 # PythonLearn
 Somthing puzzle when you see it at first time.
 come on, let't know more about it
