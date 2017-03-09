@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from collections import ChainMap
+x = {'a': 1, 'b': 2}
+y = {'a': 3, 'c': 4}
+z = ChainMap(x, y)
+print(z['a'], z['b'], z['c'])
+print(z.keys(), z.values(), z.items(), len(z))
+print(list(z.keys()), list(z.values()), list(z.items()), len(z))
+
+z['a'], z['b'], z['c'] = 9, 8, 7
+print(x, y)
+del z['a']
+print(x, y, z, z['a'], z['b'], z['c'])
+try:
+    del z['a']
+except KeyError as e:
+    print(e)
+
+values = z.new_child()
+print(z, values, type(values))
+values['f'] = 5
+print(z, values, type(values))
+values = z.new_child()
+values['e'] = 6
+print(z, values, type(values))
+values = values.new_child()
+values['g'] = 7
+print(z, values, type(values))
+new = values.parents
+print(new)
+new = new.parents.parents
+print(new)
+
+new = dict(y)
+print(new, type(new))
+new.update(x)
+print(new, id(x), id(y), id(new))
+new['c'] = 10
+print(x, y, new)
+
+# python versions 3.5
+new = {**x, **y}
+print(x, y, new, type(new))

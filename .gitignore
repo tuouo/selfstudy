@@ -50,3 +50,16 @@ www/uikit
 
 # Cache
 www/__pycache__/
+=======
+# env:
+venv
+version
+
+# resource
+static
+
+# Cache
+__pycache__/
+
+# Test
+pre/test.py

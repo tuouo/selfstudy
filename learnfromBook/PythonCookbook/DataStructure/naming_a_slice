@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+# ####### 0123456789012345678901234567890123456789012345678901234567890'
+record = '...................  100      .......   513.25   ..........'
+cost = int(record[20:28]) * float(record[40:48])
+SHARES = slice(20, 28)
+PRICE = slice(40, 48)
+cost2 = int(record[SHARES]) * float(record[PRICE])
+print(cost, cost2)
+
+s = slice(3, 5)
+print(s.start, s.step, s.stop, type(s))
+s = slice(3, 5, 1)
+print(s.start, s.step, s.stop)
+item = [1, 3, 4, 7, 4, 2, 9, 5, 3]
+print(item[3:5], item[s])
+item[s] = [10, 88]
+print(item)
+del item[s]
+print(item)
+del item[2:4]
+print(item)
+
+greet = "HelloWordI'mDoc"
+ss = s.indices(len(greet))
+print(ss, type(ss), len(greet))
+s = slice(3, 5, 3)
+ss = s.indices(len(greet))
+print(ss)
+s = slice(13, 50, 4)
+ss = s.indices(len(greet))
+print(ss)
+s = slice(30, 50, 3)
+ss = s.indices(len(greet))
+print(ss)
+
+# page 18
+a = slice(10, 50, 2)
+s = 'HelloWorld'
+print(a.indices(len(s)))

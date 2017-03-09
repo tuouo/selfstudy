@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import heapq
+import copy
+
+
+def heap_sort(iterable):
+    h = []
+    for value in iterable:
+        heapq.heappush(h, value)
+    return [heapq.heappop(h) for i in range(len(h))]
+
+nums = [1, 8, 2, 23, 7, -4, 18, 23, 42, 37, 2, 3, 4, 5, 6, 9, 10]
+nums2 = copy.copy(nums)
+print(heapq.nlargest(4, nums))
+print(heapq.nsmallest(4, nums))
+print(heap_sort(nums))
+heapq.heappush(nums, 11)
+print(nums)
+print(heapq.heappushpop(nums, 100))
+print(heapq.heapreplace(nums, 0))
+print(nums)
+print(heapq.nsmallest(4, nums))
+
+print("nums2: ", nums2)
+heapq.heapify(nums2)
+print(nums2)
+print(heapq.heappushpop(nums2, 100))
+print(nums2)
+
+
+h = []
+heapq.heappush(h, (5, 'write code'))
+heapq.heappush(h, (7, 'release product'))
+heapq.heappush(h, (1, 'write spec'))
+heapq.heappush(h, (3, 'create tests'))
+print(heapq.heappop(h))

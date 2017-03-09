@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import re
+from calendar import month_abbr
+
+line = 'asdf   fjdk;  afed, fjek,asdf,      foo'
+words_only = re.split(r'[;,\s]\s*', line)
+words_with = re.split(r'(;|,|\s)\s*', line)
+words_only_group = re.split(r'(?:;|,|\s)\s*', line)
+print(words_only, words_with, words_only_group, sep="\n")
+
+info = "Today is 16/10/2016. That day is 4/27/2017."
+date_pat = re.compile(r'\d+/\d+/\d+')
+print(date_pat.findall(info))
+date_pat = re.compile(r'(\d+)/(\d+)/(\d+)')
+print(date_pat.findall(info), date_pat.finditer(info))
+for m in date_pat.finditer(info):
+    print(m.groups(), m.group(0), m.group(1))
+
+info_new = re.sub(r'(\d+)/(\d+)/(\d+)', r'\3-\1-\2', info)
+print(info, info_new, date_pat.sub(r'\3-\1-\2', info), sep="\n")
+
+
+def change_date(m):
+    mon_name = month_abbr[int(m.group(1))]
+    return '{} {} {}'.format(m.group(2), mon_name, m.group(3))
+
+print(date_pat.sub(change_date, info))
