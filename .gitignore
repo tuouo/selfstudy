@@ -6,3 +6,15 @@ test.html
 
 # source:
 images/
+
+# =======
+# My tool py:
+
+# My resource
+resource
+
+# Cache
+__pycache__
+
+# test
+test.py
