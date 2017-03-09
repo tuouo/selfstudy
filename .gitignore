@@ -12,14 +12,39 @@ images/
 # My resource
 forTieba/resource
 resource
+=======
+# My tool py:
+test.py
+fromLiaoxuefeng/hello.py
+
+# My resource
+resource
+numpy/a.bin
+numpy/a.txt
+numpy/result.npy
+numpy/result.npz
+forMore/resource
+
 
 # Cache
 __pycache__
 
 # test
+<<<<<<< HEAD
 test.py
 
 forTieba/test.py
 forTieba/est2.py
 forTieba/fileWriteTest.py
 forTieba/mmapTest.py
+=======
+forMore/test.log
+
+www/unskilled.py
+www/user.py
+
+# My resource
+www/uikit
+
+# Cache
+www/__pycache__/
