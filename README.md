@@ -20,7 +20,6 @@ Implementation of unskilled Python
 
 =======
 # learnFromBook
-learn from book
 =======
 # flaskweb
 OK, it's time for flask.
