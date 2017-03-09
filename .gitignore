@@ -1,0 +1,12 @@
+# env:
+venv
+version
+
+# resource
+static
+
+# Cache
+__pycache__/
+
+# Test
+pre/test.py

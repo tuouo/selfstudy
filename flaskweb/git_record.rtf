@@ -1,0 +1,58 @@
+mkdir flaskweb
+cd flaskweb
+install virtualenv:
+pip install virtualenv
+
+virtualenv --version
+
+virtualenv --no-site-packages venv
+    --no-site-packages means without packages which in system Python env
+venv\Scripts\activate (windows)
+source venv/bin/activate (mac)
+deactivate
+
+
+(venv) pip install flask
+
+# git: file inside not visiable.Ignore
+
+######################################
+(venv) $ python
+>>> import flask
+>>> app_ctx = app.app_context()
+>>> app_ctx.push()
+>>> current_app.name
+'hello'
+>>> app_ctx.pop()
+>>> quit()
+
+(venv) $ python
+>>> from hello import app
+>>> app.url_map
+
+
+Error:
+ImportError: No moudle named flask.ext.script
+?? File "C:\Python34\lib\site-packages\flask\exthook.py", line 87??
+But I'm already in (venv)
+Then pip install flask-script for system Python env, unexpectedly£¬OK
+same issue:
+http://cocode.cc/t/flask-no-module-named-flask/3370
+http://cocode.cc/t/pycharm-from-flask-ext-script-import-manager/3469
+## add:
+python XXX.py runserver --> OK
+
+
+######################################
+filter
+http://jinja.pocoo.org/docs/dev/templates/#builtin-filters
+Example: Hello, {{ name|capitalize}}
+safe. not escape.(Do not use for vulua such as input)
+capitalize.
+lower.
+upper.
+title.
+trim.
+striptags.
+
+
