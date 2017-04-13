@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 2017/4/12
+from functools import wraps
+
+
+def show_method_name(fuc):
+    @wraps(fuc)
+    def wrapper():
+        print("\n\t", fuc.__name__)
+        fuc()
+    return wrapper
 
 
 class EssentialTipsAndTricks:
@@ -9,6 +18,7 @@ class EssentialTipsAndTricks:
     """
 
     @staticmethod
+    # @show_method_name
     def print_file_path_of_imported_variables():
         import sys
         import os
@@ -91,4 +101,5 @@ if __name__ == '__main__':
         if not method.startswith("_"):
             fn = getattr(EssentialTipsAndTricks, method, None)
             if callable(fn):
+                print("\n\t", fn.__name__)
                 fn()
