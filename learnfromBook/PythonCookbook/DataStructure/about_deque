@@ -2,32 +2,53 @@
 # -*- coding: utf-8 -*-
 
 from collections import deque
-q = deque(maxlen=3)
-print(q)
-q.append(1)
-q.append(2)
-print(q)
-q.pop()
-q.insert(1, 0)
-q.append(3)
-q.append(4)
-print(q)
-q.insert(5, 5)
-print(q)
 
-qq = deque()
-qq = q.copy()
-print(qq, q.maxlen)
+def test_deque():
+    q = deque(maxlen=3)
+    print(q)
+    q.append(1)
+    q.append(2)
+    print(q)
+    q.pop()
+    q.insert(1, 0)
+    q.append(3)
+    q.append(4)
+    print(q)
+    q.insert(5, 5)
+    print(q)
+    
+    qq = deque()
+    qq = q.copy()
+    print(qq, q.maxlen)
+    
+    q = deque("asd")
+    print(q)
+    q.extend("qw")
+    q.extendleft("zx")
+    print(list(q))
+    q.rotate(-1)
+    print(q)
+    q.reverse()
+    print(q)
+    print(q.maxlen, q.index("a"), q.count("a"))
+    q.clear()
+    print(q, q.maxlen)
 
-q = deque("asd")
-print(q)
-q.extend("qw")
-q.extendleft("zx")
-print(list(q))
-q.rotate(-1)
-print(q)
-q.reverse()
-print(q)
-print(q.maxlen, q.index("a"), q.count("a"))
-q.clear()
-print(q, q.maxlen)
+
+def search(lines, pattern, history=5):
+    previous_lines = deque(maxlen=history)
+    for line in lines:
+        if pattern in line:
+            yield line, previous_lines
+        previous_lines.append(line)
+
+
+if __name__ == "__main__":
+    path = r"../../somefile.txt"
+    with open(path) as f:
+        print("-" * 20)
+        for line, previous_lines in search(f, "python", 7):
+            for previous_line in previous_lines:
+                print(previous_line, end='')
+            print(line, end="")
+            print("-" * 20)
